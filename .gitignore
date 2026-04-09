@@ -1,0 +1,464 @@
+# ===========================================
+# GITIGNORE - EVAonline
+# ===========================================
+# Last updated: 2026-02-23
+# Project: EVAonline - Reference Evapotranspiration System
+# Repository: https://github.com/angelacunhasoares/EVAONLINE
+# License: AGPL-3.0-or-later
+
+# ===========================================
+# Python
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===========================================
+# Virtual Environments
+# ===========================================
+.env
+.env.*
+!.env.example
+!.env.docker
+.venv/
+.venv*/
+venv/
+venv*/
+ENV/
+env*/
+env.bak/
+venv.bak/
+conda-env/
+
+# ===========================================
+# Testing & Coverage
+# ===========================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.coveragerc
+coverage.xml
+coverage_*.xml
+coverage_*.txt
+cov_*.txt
+run_coverage.py
+.cache
+.cache.sqlite
+nosetests.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.benchmarks/
+test_output/
+test_results/
+test_*_result.txt
+test_cache_out.txt
+test_results.txt
+test_weather_result.txt
+test_full_run.txt
+temp/
+*.test
+*_test_output.*
+*_output.txt
+script*_output.txt
+*.prof
+*.lprof
+profile_output/
+
+# Temporary tests at the root
+/test_*.py
+/debug_*.py
+/analyze_*.py
+*_test.py
+*_api_test.py
+test_matopiba*.py
+*matopiba*_test.py
+dev_notebooks/
+test_notebooks/
+
+# ===========================================
+# Jupyter Notebook
+# ===========================================
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+.jupyter/
+*.nbconvert.ipynb
+*.nbconvert.html
+
+# ===========================================
+# IDEs & Editors
+# ===========================================
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.example.json
+!.vscode/settings.example.json
+!.vscode/tasks.example.json
+.idea/
+.idea_modules/
+*.iml
+*.iws
+*.swp
+*.swo
+*~
+*.code-workspace
+.history/
+*.sublime-project
+*.sublime-workspace
+
+# ===========================================
+# Operating System
+# ===========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+System Volume Information/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===========================================
+# Docker
+# ===========================================
+docker-compose.override.yml
+docker-volumes/
+docker-data/
+
+# ===========================================
+# Database
+# ===========================================
+*.sql
+*.dump
+*.sqlite
+*.sqlite3
+data/db/
+data/postgres/
+data/redis/
+
+# ===========================================
+# Redis
+# ===========================================
+*.rdb
+*.aof
+dump.rdb
+
+# ===========================================
+# Celery
+# ===========================================
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+*.celerybeat.db
+celery.log
+.celery
+
+# ===========================================
+# Logs
+# ===========================================
+logs/
+*.log
+*.log.*
+loguru/
+!logs/.gitkeep
+!logs/README.md
+perf_*.log
+performance_*.log
+debug_*.log
+dev_*.log
+development_*.log
+
+# ===========================================
+# Secrets & Keys (never commit!)
+# ===========================================
+secrets/
+keys/
+tokens/
+*.key
+*.pem
+*.crt
+*.p12
+*.token
+passwords.txt
+credentials.txt
+
+# SSL certificates in Nginx (keep .gitkeep)
+docker/nginx/ssl/*.pem
+docker/nginx/ssl/*.crt
+docker/nginx/ssl/*.key
+docker/nginx/ssl/*.p12
+!docker/nginx/ssl/.gitkeep
+!docker/nginx/ssl/README.md
+
+# ===========================================
+# Backup & Recovery Files
+# ===========================================
+*.bak
+*.backup
+*.old
+*.deprecated
+*_backup.py
+*_old.py
+*_legacy.py
+*_sync.py.old
+*.sql.backup
+*.dump.backup
+*.tar.gz.backup
+*.zip.backup
+*.py.backup
+*.js.backup
+*.html.backup
+*.yml.backup
+*.yaml.backup
+*.json.backup
+*.md.backup
+docker-compose.backup
+Dockerfile.backup
+README_backup.md
+README.backup
+openmeteo.py.bak
+openmeteo.py.old
+
+# ===========================================
+# Temporary Files
+# ===========================================
+temp/
+tmp/
+*.tmp
+*.temp
+*.config.tmp
+*.yml.tmp
+*.yaml.tmp
+.cache/
+markers_response.json
+markers_test.json
+test_markers.json
+validation_nasa_power.md
+!temp/.gitkeep
+!temp/README.md
+temp_*.py
+*_temp.py
+
+# ===========================================
+# Large Data Files
+# ===========================================
+data/FILE_CSV/
+data/FILE_GEOJSON/
+data/SHAPEFILE_CLIMA_BR/
+data/large_files/
+data/backups/
+data/temp/
+data/cache/
+data/processing/
+data/shapefile/
+data/csv/ST_PLOT.csv
+
+# Keep reference data
+!data/original_data/eto_xavier_csv/*.csv
+!data/FILE_CSV/*.csv
+!data/FILE_GEOJSON/*.geojson
+!data/SHAPEFILE_CLIMA_BR/*.shp
+!data/SHAPEFILE_CLIMA_BR/*.shx
+!data/SHAPEFILE_CLIMA_BR/*.dbf
+
+# ===========================================
+# Data Processing
+# ===========================================
+*.processed
+*.intermediate
+eto_temp/
+eto_cache/
+gis_temp/
+shapefile_temp/
+
+# ===========================================
+# Assets Generation
+# ===========================================
+assets_generation/**/*.tmp
+assets_generation/**/*.temp
+assets_generation/**/__pycache__/
+assets_generation/**/.ipynb_checkpoints/
+
+# ===========================================
+# Backend Specific
+# ===========================================
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/logs/*.log
+
+# File deleted during async migration
+backend/api/services/openmeteo.py
+
+# ===========================================
+# Legacy Requirements
+# ===========================================
+# Do not ignore requirements.txt (used in the Dockerfile)
+requirements/
+requirements.txt.bak
+requirements.txt.old
+
+# ===========================================
+# Local & Environment Configs
+# ===========================================
+config/local/
+config/development/
+config/production/
+
+# ===========================================
+# Monitoring (local data volumes)
+# ===========================================
+monitoring/prometheus/data/
+monitoring/grafana/data/
+
+# ===========================================
+# Node.js (if used)
+# ===========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ===========================================
+# Distribution & Build
+# ===========================================
+build_log.txt
+*.whl
+*.manifest
+*.spec
+*.pid
+
+# ===========================================
+# Type Checkers & Linters
+# ===========================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pylint.d/
+
+# ===========================================
+# Performance & Debugging
+# ===========================================
+*.debug
+*.dmp
+*.mdmp
+core
+core.*
+!backend/core/
+!backend/core/**
+!backend/tests/unit/core/
+!backend/tests/unit/core/**
+!frontend/core/
+!frontend/core/**
+
+# ===========================================
+# Security & Development Scripts
+# ===========================================
+reorganize_*.ps1
+reorganize_*.sh
+cleanup_*.ps1
+cleanup_*.sh
+reorganize*.ps1
+cleanup*.ps1
+
+# ===========================================
+# Migration Artifacts
+# ===========================================
+migration_backup/
+async_migration_backup/
+elevation_migration_backup/
+archive/
+
+# ===========================================
+# Article manuscript
+# ===========================================
+docs/*.tex
+docs/*.bib
+docs/figures/
+docs/restructure_*.py
+
+# ===========================================
+# Archive & Deprecated Docs
+# ===========================================
+docs/archive/
+docs/temp/
+docs/drafts/
+
+/tests/deprecated/
+!tests/conftest.py
+!tests/README.md
+!tests/*/README.md
+
+# ===========================================
+# Validation Dataset (published on Zenodo)
+# ===========================================
+# Full dataset available at: https://doi.org/10.5281/zenodo.17791398
+EVAonline_validation_v1.0.0/
+
+# ===========================================
+# Project Specific Files (KEPT)
+# ===========================================
+!translations/en.json
+!translations/pt.json
+!templates/custom_layer.html
+!docker/backend/Dockerfile
+!docker/backend/entrypoint.sh
+!docker/nginx/Dockerfile
+!docker/nginx/nginx.conf
+!docker/monitoring/prometheus/Dockerfile
+!docker/monitoring/prometheus.yml
+!docker/monitoring/blackbox.yml
+!docker/monitoring/grafana/provisioning/**/*.yml
+!docker/monitoring/grafana/dashboards/**/*.json
+!start-monitoring.sh
+!start-monitoring.bat
+!GRAFANA_README.md

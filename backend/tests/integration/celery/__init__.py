@@ -1,0 +1,1 @@
+"""Celery Integration Tests"""

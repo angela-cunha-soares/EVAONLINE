@@ -1,0 +1,1680 @@
+/* ==============================================
+   EVAONLINE - CUSTOM CSS
+   ==============================================
+   
+   TABLE OF CONTENTS:
+   ------------------
+   1. CSS VARIABLES (Custom Properties)
+   2. RESET & BASE
+   3. TYPOGRAPHY
+   4. COMPONENTS
+      4.1 Buttons
+      4.2 Forms & Inputs
+      4.3 Cards
+      4.4 Badges
+      4.5 Progress Bars
+      4.6 Dropdowns
+      4.7 Accordions
+      4.8 Tooltips
+   5. LAYOUT
+      5.1 Containers
+      5.2 App Root Structure
+   6. NAVBAR
+   7. FOOTER
+   8. PAGES
+      8.1 Home Page (Sidebar, Map Card)
+      8.2 Documentation Page
+      8.3 Results & Tabs
+   9. MAP & LEAFLET
+      9.1 Map Container
+      9.2 Layer Controls
+      9.3 Popups
+   10. UTILITIES
+   11. ANIMATIONS
+   12. MEDIA QUERIES (Mobile-first, grouped)
+       12.1 min-width breakpoints (Typography)
+       12.2 max-width: 991px (Tablets)
+       12.3 max-width: 767px (Mobile landscape)
+       12.4 max-width: 575px (Mobile portrait)
+   
+   ============================================== */
+
+
+/* ==============================================
+   1. CSS VARIABLES (Custom Properties)
+   ============================================== */
+
+:root {
+    /* ===== Brand Colors ===== */
+    --color-primary: #006699;
+    --color-primary-light: #0088aa;
+    --color-primary-lighter: #00a3cc;
+    --color-primary-dark: #005580;
+
+    /* ===== Accent Colors ===== */
+    --color-accent: #667eea;
+    --color-accent-dark: #764ba2;
+
+    /* ===== Semantic Colors ===== */
+    --color-success: #28a745;
+    --color-success-dark: #1b5e20;
+    --color-danger: #e74c3c;
+    --color-warning: #ffc107;
+
+    /* ===== Mode Colors (Historical/Recent/Forecast) ===== */
+    --color-historical: #1565c0;
+    --color-historical-dark: #0d47a1;
+    --color-recent: #2e7d32;
+    --color-recent-dark: #1b5e20;
+    --color-forecast: #7b1fa2;
+    --color-forecast-dark: #4a148c;
+
+    /* ===== Neutral Colors ===== */
+    --color-text: #2c3e50;
+    --color-text-muted: #6c757d;
+    --color-text-light: #495057;
+    --color-text-subtle: #5a6c7d;
+
+    /* ===== Background Colors ===== */
+    --color-bg-white: #ffffff;
+    --color-bg-light: #f8f9fa;
+    --color-bg-lighter: #fafafa;
+    --color-bg-hover: #e8f4f8;
+    --color-bg-accent-hover: #f0f4ff;
+
+    /* ===== Border Colors ===== */
+    --color-border: #e9ecef;
+    --color-border-light: #dee2e6;
+    --color-border-dark: #e0e0e0;
+
+    /* ===== Map Colors ===== */
+    --color-map-water: #a8d4e6;
+    --color-map-marker: #3388ff;
+
+    /* ===== Spacing ===== */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 40px;
+
+    /* ===== Border Radius ===== */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 20px;
+    --radius-full: 50%;
+
+    /* ===== Shadows ===== */
+    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 15px 50px rgba(0, 0, 0, 0.15);
+    --shadow-primary: 0 2px 4px rgba(0, 102, 153, 0.2);
+    --shadow-success: 0 4px 15px rgba(40, 167, 69, 0.3);
+    --shadow-accent: 0 2px 8px rgba(102, 126, 234, 0.2);
+
+    /* ===== Transitions ===== */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+
+    /* ===== Z-Index Scale ===== */
+    --z-dropdown: 1000;
+    --z-sticky: 1001;
+    --z-layer-control: 1002;
+    --z-navbar: 1030;
+    --z-accent-bar: 1031;
+    --z-toast: 9999;
+}
+
+
+/* ==============================================
+   2. RESET & BASE
+   ============================================== */
+
+/* Remove default spacing */
+body,
+html {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Transitions are applied per-component (buttons, cards, links)
+   instead of universally on * for better rendering performance. */
+
+
+/* ==============================================
+   3. TYPOGRAPHY
+   ============================================== */
+
+/* Base font size - large and readable */
+html {
+    font-size: 22px !important;
+}
+
+body {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1,
+.h1 {
+    font-size: 2.2rem !important;
+    font-weight: 600;
+}
+
+h2,
+.h2 {
+    font-size: 1.9rem !important;
+    font-weight: 600;
+}
+
+h3,
+.h3 {
+    font-size: 1.6rem !important;
+    font-weight: 500;
+}
+
+h4,
+.h4 {
+    font-size: 1.35rem !important;
+    font-weight: 500;
+}
+
+h5,
+.h5 {
+    font-size: 1.2rem !important;
+    font-weight: 500;
+}
+
+h6,
+.h6 {
+    font-size: 1.1rem !important;
+    font-weight: 500;
+}
+
+/* Body text */
+p,
+li,
+td,
+th,
+label,
+span:not(.badge):not(.navbar-brand-title),
+a:not(.navbar-brand-link) {
+    font-size: 1rem !important;
+}
+
+/* Small text */
+.small,
+small {
+    font-size: 0.9rem !important;
+}
+
+/* Utility text classes */
+.text-base {
+    font-size: 1rem !important;
+}
+
+.text-sm {
+    font-size: 0.95rem !important;
+}
+
+.input-text {
+    font-size: 1rem !important;
+}
+
+.input-group-label {
+    font-size: 0.95rem !important;
+}
+
+.help-text {
+    font-size: 0.9rem !important;
+}
+
+
+/* ==============================================
+   4. COMPONENTS
+   ============================================== */
+
+/* ----- 4.1 Buttons ----- */
+
+.btn {
+    font-size: 1rem !important;
+    padding: 0.7rem 1.3rem !important;
+}
+
+.btn-sm {
+    font-size: 0.95rem !important;
+    padding: 0.5rem 0.9rem !important;
+}
+
+.btn-lg {
+    font-size: 1.15rem !important;
+    padding: 0.8rem 1.5rem !important;
+}
+
+/* Calculate ETo button */
+.btn-calculate-eto {
+    border-radius: 10px;
+    box-shadow: var(--shadow-success);
+    transition: var(--transition-normal);
+}
+
+.btn-calculate-eto:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Success button animations */
+.btn-success:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4) !important;
+}
+
+.btn-success:not(:disabled):active {
+    transform: translateY(0);
+}
+
+
+/* ----- 4.2 Forms & Inputs ----- */
+
+.form-control,
+.form-select {
+    font-size: 1rem !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--color-border);
+    transition: var(--transition-fast);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.form-check-label {
+    font-size: 1rem !important;
+}
+
+/* Input group fixed width */
+.input-group-fixed {
+    min-width: 42px;
+}
+
+/* DatePicker — input fields */
+.SingleDatePicker,
+.SingleDatePickerInput {
+    width: 100% !important;
+    display: block !important;
+}
+
+.DateInput {
+    width: 100% !important;
+}
+
+.DateInput_input {
+    border-radius: var(--radius-md) !important;
+    font-size: 0.95rem !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    line-height: 1.4 !important;
+}
+
+/* DatePicker — calendar popup */
+.SingleDatePicker_picker {
+    z-index: 1050 !important;
+    transform: scale(1.15) !important;
+    transform-origin: top left !important;
+}
+
+.SingleDatePicker_picker .CalendarDay {
+    font-size: 0.78rem !important;
+}
+
+.SingleDatePicker_picker .DayPicker_weekHeader_li small {
+    font-size: 0.75rem !important;
+}
+
+.SingleDatePicker_picker .CalendarMonth_caption strong {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+}
+
+/* Custom radio group (sidebar) */
+.custom-radio-group .form-check {
+    margin-bottom: 0;
+}
+
+.custom-radio-group .form-check-label {
+    cursor: pointer;
+    transition: var(--transition-fast);
+    border: 1px solid var(--color-border) !important;
+    background-color: var(--color-bg-lighter);
+}
+
+.custom-radio-group .form-check-label:hover {
+    background-color: var(--color-bg-accent-hover) !important;
+    border-color: var(--color-accent) !important;
+    transform: translateX(3px);
+}
+
+.custom-radio-group .form-check-input:checked+.form-check-label {
+    background-color: var(--color-bg-accent-hover) !important;
+    border-color: var(--color-accent) !important;
+    box-shadow: var(--shadow-accent);
+}
+
+
+/* ----- 4.3 Cards ----- */
+
+.card-body {
+    font-size: 1rem !important;
+}
+
+.card-title {
+    font-size: 1.25rem !important;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 1rem !important;
+}
+
+/* Card wrapper (sidebar and map) */
+.card-wrapper {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: none;
+}
+
+/* Academic card style */
+.card-academic {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: none;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-academic:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Academic card headers */
+.card-header-academic {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    color: white;
+}
+
+.card-header-academic-alt {
+    background: linear-gradient(135deg, #007399 0%, #0099bb 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    color: white;
+}
+
+/* Card header icon */
+.card-header-icon {
+    font-size: 1.8rem;
+}
+
+/* Shadow utilities */
+.shadow-soft {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+
+/* ----- 4.4 Badges ----- */
+
+.badge {
+    font-size: 0.85rem !important;
+}
+
+.badge-gradient {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+    padding: 5px 12px;
+    border-radius: var(--radius-xl);
+}
+
+
+/* ----- 4.5 Progress Bars ----- */
+
+.progress,
+.progress-bar {
+    height: 24px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+.progress {
+    border-radius: var(--radius-md) !important;
+    overflow: hidden !important;
+}
+
+.progress-bar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.progress-bar-animated {
+    animation: progress-bar-stripes 1s linear infinite !important;
+}
+
+
+/* ----- 4.6 Dropdowns (Dash Select) ----- */
+
+.Select-menu-outer,
+.Select-option,
+.Select-value-label,
+.Select-control,
+.Select-input input,
+.Select-placeholder {
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+}
+
+.dash-dropdown,
+.Select,
+.Select-control {
+    min-height: 42px !important;
+}
+
+.Select-option {
+    padding: 12px 16px !important;
+}
+
+.Select-value {
+    line-height: 40px !important;
+}
+
+.Select-placeholder {
+    line-height: 40px !important;
+}
+
+
+/* ----- 4.7 Accordions ----- */
+
+.accordion {
+    margin-top: 0px !important;
+}
+
+.accordion-button::after {
+    width: 1.5rem;
+    height: 1.5rem;
+    background-size: 1.5rem;
+    filter: brightness(0.7);
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0.5);
+}
+
+.accordion-button:hover {
+    background-color: var(--color-bg-light);
+}
+
+.accordion-button:hover::after {
+    filter: brightness(0.4);
+}
+
+
+/* ----- 4.8 Tooltips ----- */
+
+.tooltip-inner {
+    max-width: 250px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    text-align: left;
+}
+
+
+/* ==============================================
+   5. LAYOUT
+   ============================================== */
+
+/* ----- 5.1 Containers ----- */
+
+.container,
+.container-fluid {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.container>.row {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.container>*:last-child,
+.row:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.pb-0 {
+    padding-bottom: 0 !important;
+}
+
+
+/* ----- 5.2 App Root Structure ----- */
+
+.app-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#page-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 0 !important;
+}
+
+._dash-app-content,
+#react-entry-point,
+#_pages_plugin_content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* ==============================================
+   6. NAVBAR
+   ============================================== */
+
+/* Accent bar at top */
+.navbar-accent-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 50%, var(--color-primary-lighter) 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-accent-bar);
+}
+
+/* Navbar container */
+.navbar-academic {
+    background-color: var(--color-bg-white);
+    border-bottom: 1px solid var(--color-border-dark);
+    padding: 5px 0;
+    margin-top: 4px;
+    box-shadow: var(--shadow-xs);
+}
+
+/* Brand */
+.navbar-brand-link {
+    text-decoration: none;
+}
+
+.navbar-brand-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-brand-header {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand-icon {
+    font-size: 2.8rem;
+    color: var(--color-primary);
+}
+
+.navbar-brand-title {
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary) !important;
+    letter-spacing: -0.5px;
+    display: inline-block !important;
+    line-height: 1 !important;
+}
+
+.navbar-brand-subtitle {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--color-text-subtle);
+    line-height: 1.1;
+    margin-top: 0;
+    margin-left: 2px;
+}
+
+/* Navbar toggler */
+#navbar-toggler {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    padding: 4px 10px;
+}
+
+#navbar-toggler:hover {
+    background-color: var(--color-bg-hover) !important;
+    border-color: var(--color-primary) !important;
+}
+
+#navbar-toggler i {
+    font-size: 1.5rem;
+}
+
+/* Navigation links */
+.nav-link-academic {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.nav-link-academic:hover {
+    background-color: var(--color-bg-hover) !important;
+    color: var(--color-primary) !important;
+    transform: translateY(-1px);
+}
+
+.nav-link-academic.active {
+    background-color: transparent !important;
+    color: var(--color-primary) !important;
+    border-bottom: 3px solid var(--color-primary);
+    border-radius: 0;
+    padding-bottom: 5px;
+}
+
+/* GitHub link */
+.nav-link-github {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link-github i {
+    font-size: 1rem;
+}
+
+/* Language toggle */
+#language-toggle {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: var(--radius-xl);
+    min-width: 130px;
+    text-align: center;
+    box-shadow: var(--shadow-primary);
+    transition: var(--transition-fast);
+}
+
+#language-toggle:hover {
+    background-color: var(--color-primary-dark) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 102, 153, 0.3) !important;
+}
+
+
+/* ==============================================
+   7. FOOTER
+   ============================================== */
+
+/* Footer container */
+.footer-professional {
+    margin-top: 10px;
+    padding-top: 0;
+    padding-bottom: 15px;
+    overflow-x: hidden;
+}
+
+footer,
+footer.bg-white {
+    margin-top: 5px !important;
+    padding-top: 5px !important;
+}
+
+.footer-container {
+    padding-left: 40px;
+    padding-right: 40px;
+    max-width: 1400px;
+}
+
+/* Footer dividers */
+.footer-divider-top {
+    border-top: 1px solid var(--color-border-light);
+    opacity: 0.5;
+}
+
+.footer-divider-copyright {
+    border-color: var(--color-border-light);
+}
+
+/* Footer column titles */
+.footer-column-title {
+    color: var(--color-primary-light) !important;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    margin-bottom: 15px !important;
+    border-bottom: 2px solid var(--color-primary-light);
+    display: inline-block;
+}
+
+/* Footer links */
+.footer-email-link {
+    text-decoration: none;
+    font-size: 0.875rem;
+    color: var(--color-primary-light);
+    transition: color var(--transition-fast);
+}
+
+.footer-email-link:hover {
+    color: #006688;
+    text-decoration: underline;
+}
+
+.footer-copy-btn {
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color var(--transition-fast);
+}
+
+.footer-copy-btn:hover {
+    color: var(--color-primary-light);
+}
+
+/* Simple footer container */
+.footer-simple-container {
+    padding-left: 40px;
+    padding-right: 40px;
+    max-width: 100%;
+}
+
+.footer-license-link {
+    text-decoration: underline;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+}
+
+.footer-license-link:hover {
+    color: var(--color-primary-light);
+}
+
+/* Partner logos */
+.footer-partner-logo {
+    height: 100px;
+    max-width: 180px;
+    margin: 10px;
+    display: block;
+    object-fit: contain;
+    opacity: 0.9;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.footer-partner-logo:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.footer-partner-link {
+    text-decoration: none;
+}
+
+.logo-partner {
+    transition: var(--transition-normal);
+    filter: grayscale(0%);
+}
+
+.logo-partner:hover {
+    transform: scale(1.1);
+    filter: grayscale(0%) brightness(1.1);
+}
+
+/* Footer icon links */
+.footer-icon-link {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    transition: transform var(--transition-fast);
+}
+
+.footer-icon-link:hover {
+    transform: translateY(-3px);
+}
+
+.footer-icon {
+    font-size: 40px;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+}
+
+.footer-icon-link:hover .footer-icon {
+    color: var(--color-primary-light);
+}
+
+.footer-icon-label {
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+}
+
+.footer-icon-link:hover .footer-icon-label {
+    color: var(--color-primary-light);
+}
+
+/* GitHub icon */
+.footer-github-icon {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+    transition: transform var(--transition-fast);
+}
+
+.footer-icon-link:hover .footer-github-icon {
+    transform: scale(1.1);
+}
+
+.github-icon:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* ORCID icon */
+.footer-orcid-icon {
+    height: 18px;
+    width: 18px;
+    vertical-align: middle;
+    opacity: 0.85;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.footer-orcid-icon:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* Visitors */
+.footer-visitors {
+    color: var(--color-text-muted);
+}
+
+/* Legacy footer link hovers */
+.license-link:hover i {
+    color: #0d6efd !important;
+    transform: scale(1.1);
+}
+
+.docs-link:hover i {
+    color: #198754 !important;
+    transform: scale(1.1);
+}
+
+
+/* ==============================================
+   8. PAGES
+   ============================================== */
+
+/* ----- 8.1 Home Page ----- */
+
+/* Sidebar body */
+.sidebar-body {
+    background-color: var(--color-bg-white);
+    min-height: 400px;
+}
+
+/* Section separator */
+.section-separator {
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Forecast icon (purple) */
+.forecast-icon {
+    color: var(--color-forecast);
+}
+
+/* Header/icon sizes */
+.header-icon {
+    font-size: 1.5rem !important;
+}
+
+.icon-sm {
+    font-size: 1.2rem !important;
+}
+
+/* Toast container */
+.toast-container-fixed {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: var(--z-toast);
+    min-width: 300px;
+}
+
+/* MATOPIBA reference */
+.matopiba-reference {
+    font-size: 0.75rem !important;
+}
+
+.matopiba-reference a {
+    font-size: inherit !important;
+}
+
+
+/* ----- 8.2 Documentation Page ----- */
+
+/* Container */
+.doc-page-container {
+    background-color: var(--color-bg-light);
+    min-height: 100vh;
+}
+
+/* Navigation card */
+.doc-nav-card {
+    border: none;
+    border-bottom: 3px solid var(--color-primary-light);
+    border-radius: 0;
+    background: linear-gradient(to bottom, var(--color-bg-white), var(--color-bg-light));
+}
+
+.doc-nav-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary-light) var(--color-border);
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+}
+
+.doc-nav-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.doc-nav-container::-webkit-scrollbar-track {
+    background: var(--color-border);
+}
+
+.doc-nav-container::-webkit-scrollbar-thumb {
+    background: var(--color-primary-light);
+    border-radius: 2px;
+}
+
+/* Navigation links */
+.doc-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    border-right: 1px solid var(--color-border);
+    transition: var(--transition-fast);
+    position: relative;
+}
+
+.doc-nav-link:last-child {
+    border-right: none;
+}
+
+.doc-nav-link:hover {
+    background-color: rgba(0, 136, 170, 0.08);
+    color: var(--color-primary-light);
+}
+
+.doc-nav-link:hover .doc-nav-number {
+    background-color: var(--color-primary-light);
+    color: white;
+}
+
+.doc-nav-link i {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+}
+
+.doc-nav-link:hover i {
+    color: var(--color-primary-light);
+}
+
+/* Section numbers */
+.doc-nav-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    background-color: var(--color-border);
+    border-radius: var(--radius-full);
+    margin-right: 6px;
+    transition: var(--transition-fast);
+}
+
+/* Section titles */
+.doc-section-title {
+    color: var(--color-text) !important;
+}
+
+/* Step badges */
+.doc-step-badge {
+    font-size: 1.2rem !important;
+    padding: 8px 14px !important;
+    border-radius: var(--radius-full) !important;
+}
+
+/* Icons */
+.doc-emoji-icon {
+    font-size: 1.5rem;
+}
+
+.doc-emoji-icon-lg {
+    font-size: 1.8rem;
+}
+
+.doc-icon-md {
+    font-size: 1.3rem;
+}
+
+.doc-icon-lg {
+    font-size: 1.5rem;
+}
+
+/* Table columns */
+.doc-table-col-wide {
+    width: 25%;
+}
+
+.doc-table-col-narrow {
+    width: 10%;
+}
+
+/* Mode card headers */
+.doc-card-header-historical {
+    background: linear-gradient(135deg, var(--color-historical), var(--color-historical-dark)) !important;
+    color: white !important;
+}
+
+.doc-card-header-recent {
+    background: linear-gradient(135deg, var(--color-recent), var(--color-recent-dark)) !important;
+    color: white !important;
+}
+
+.doc-card-header-forecast {
+    background: linear-gradient(135deg, var(--color-forecast), var(--color-forecast-dark)) !important;
+    color: white !important;
+}
+
+/* Flag icons */
+.doc-flag-icon {
+    height: 1.1em;
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.doc-flag-icon-sm {
+    width: 14px;
+    height: 10px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+
+/* ----- 8.3 Results & Tabs ----- */
+
+.nav-tabs.results-tabs {
+    border-bottom: 3px solid var(--color-primary-light);
+    margin-bottom: 20px;
+}
+
+.nav-tabs.results-tabs .nav-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+    border: 2px solid transparent;
+    border-bottom: none;
+    padding: 12px 24px;
+    margin-right: 4px;
+    background-color: var(--color-bg-light);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    transition: var(--transition-fast);
+}
+
+.nav-tabs.results-tabs .nav-link:hover {
+    background-color: var(--color-border);
+    border-color: var(--color-border-light) var(--color-border-light) transparent;
+    color: var(--color-primary-light);
+}
+
+.nav-tabs.results-tabs .nav-link.active {
+    background-color: var(--color-primary-light);
+    color: white;
+    border-color: var(--color-primary-light);
+    font-weight: 700;
+}
+
+.nav-tabs.results-tabs .nav-link.active:hover {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.nav-tabs.results-tabs .nav-link i,
+.nav-tabs.results-tabs .nav-link .bi {
+    margin-right: 8px;
+}
+
+.results-section-title {
+    color: var(--color-primary-light);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.results-section-title i {
+    font-size: 1.3rem;
+}
+
+.results-table-title {
+    color: var(--color-text-light);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 4px solid var(--color-primary-light);
+}
+
+
+/* ==============================================
+   9. MAP & LEAFLET
+   ============================================== */
+
+/* ----- 9.1 Map Container ----- */
+
+.map-card-body {
+    padding: 0 !important;
+    aspect-ratio: 16 / 9;
+    max-height: 650px;
+    background-color: transparent;
+    overflow: hidden;
+}
+
+.map-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.leaflet-map,
+.leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background: var(--color-map-water) !important;
+}
+
+
+/* ----- 9.2 Layer Controls ----- */
+
+.layer-control-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: var(--z-layer-control);
+}
+
+.layer-control-toggle-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: var(--z-sticky);
+    background: white;
+    border: 2px solid var(--color-map-marker);
+    border-radius: var(--radius-full);
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-normal);
+}
+
+.layer-control-toggle-btn:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
+.layer-control-panel {
+    position: absolute;
+    top: 10px;
+    right: 60px;
+    z-index: var(--z-dropdown);
+    background: white;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: auto;
+    max-height: 350px;
+    overflow-y: auto;
+    border: 2px solid var(--color-map-marker);
+    animation: fadeIn 0.3s;
+}
+
+.layer-control-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.layer-control-title {
+    margin: 0;
+    font-weight: bold;
+    color: var(--color-text);
+    flex: 1;
+    font-size: 20px !important;
+}
+
+.layer-control-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #7f8c8d;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    line-height: 20px;
+}
+
+.layer-control-close-btn:hover {
+    color: var(--color-danger);
+}
+
+.layer-checklist {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.layer-checkbox-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 5px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+}
+
+.layer-checkbox-label:hover {
+    background-color: var(--color-bg-light);
+}
+
+/* Flag icons in layers */
+.emoji-flag {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    font-size: 1em;
+}
+
+.layer-flag-icon {
+    width: 18px;
+    height: 13px;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+
+/* ----- 9.3 Popups ----- */
+
+.map-popup-container {
+    min-width: 250px;
+    padding: 8px;
+}
+
+.map-popup-title {
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.map-popup-country {
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.map-popup-hr {
+    margin: 8px 0;
+}
+
+.map-popup-coords {
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.map-popup-info {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.map-marker-popup {
+    margin: 8px;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.map-city-popup {
+    min-width: 200px;
+}
+
+.map-popup-city-link {
+    color: #2c5282;
+}
+
+.map-piracicaba-popup {
+    min-width: 280px;
+    padding: 10px;
+}
+
+
+/* ==============================================
+   10. UTILITIES
+   ============================================== */
+
+/* Gradient utilities */
+.gradient-purple {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%) !important;
+}
+
+.gradient-green {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+}
+
+
+/* ==============================================
+   11. ANIMATIONS
+   ============================================== */
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 10px 5px rgba(255, 193, 7, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* ==============================================
+   12. MEDIA QUERIES
+   ============================================== */
+
+/* ----- 12.1 Typography Scaling (min-width) ----- */
+
+@media (min-width: 576px) {
+    html {
+        font-size: 22px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 24px !important;
+    }
+}
+
+@media (min-width: 992px) {
+    html {
+        font-size: 24px !important;
+    }
+
+    .container {
+        max-width: 95% !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    html {
+        font-size: 26px !important;
+    }
+
+    .container {
+        max-width: min(95%, 1400px) !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    html {
+        font-size: 26px !important;
+    }
+
+    .container {
+        max-width: min(95%, 1600px) !important;
+    }
+}
+
+@media (min-width: 1800px) {
+    .container {
+        max-width: min(95%, 1800px) !important;
+    }
+}
+
+
+/* ----- 12.2 Tablets (max-width: 991px) ----- */
+
+@media (max-width: 991.98px) {
+
+    /* Navbar mobile menu */
+    .navbar-collapse {
+        background-color: var(--color-bg-white);
+        padding: 15px;
+        border-radius: var(--radius-md);
+        margin-top: 10px;
+        box-shadow: var(--shadow-md);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: var(--z-dropdown);
+    }
+
+    .navbar-collapse.show {
+        display: block !important;
+    }
+
+    .nav-link-academic {
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #f0f0f0;
+        display: block;
+        width: 100%;
+    }
+
+    .nav-link-academic:last-child {
+        border-bottom: none;
+    }
+
+    .navbar .container {
+        position: relative;
+    }
+
+    .navbar-brand-title {
+        font-size: 1.8rem !important;
+    }
+
+    .navbar-brand-subtitle {
+        font-size: 0.75rem !important;
+        display: none;
+    }
+
+    #navbar-toggler {
+        display: flex !important;
+        padding: 8px 12px;
+        border: 2px solid var(--color-primary);
+    }
+
+    #language-toggle {
+        width: 100%;
+        margin-top: 10px;
+        margin-left: 0 !important;
+    }
+
+    .navbar-collapse .navbar-nav {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    /* Map */
+    .leaflet-container {
+        height: 450px !important;
+    }
+}
+
+
+/* ----- 12.3 Mobile Landscape (max-width: 767px) ----- */
+
+@media (max-width: 767.98px) {
+
+    /* Map */
+    .leaflet-container {
+        height: 350px !important;
+    }
+
+    /* Cards */
+    .card-header-academic,
+    .card-header-academic-alt {
+        padding: 12px 15px !important;
+    }
+
+    .card-header-academic h5,
+    .card-header-academic-alt h5 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Documentation nav */
+    .doc-nav-link {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    .doc-nav-number {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+
+    /* Footer */
+    footer .container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    .footer-column-title {
+        font-size: 1rem;
+    }
+
+    .footer-partner-logo {
+        height: 50px !important;
+    }
+}
+
+
+/* ----- 12.4 Mobile Portrait (max-width: 575px) ----- */
+
+@media (max-width: 575.98px) {
+
+    /* Typography */
+    html {
+        font-size: 15px !important;
+    }
+
+    /* Map */
+    .leaflet-container {
+        height: 280px !important;
+    }
+
+    /* Containers */
+    .container-fluid,
+    .container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    /* Navbar */
+    .navbar-brand-title {
+        font-size: 1.5rem !important;
+    }
+
+    .navbar-brand-subtitle {
+        display: none !important;
+    }
+
+    .navbar-brand-icon {
+        font-size: 1.8rem !important;
+    }
+
+    #navbar-toggler {
+        padding: 6px 10px !important;
+    }
+
+    #navbar-toggler i {
+        font-size: 1.2rem !important;
+    }
+
+    /* Cards */
+    .card-academic {
+        box-shadow: var(--shadow-sm) !important;
+    }
+
+    /* Buttons */
+    .btn-calculate-eto {
+        font-size: 0.95rem !important;
+    }
+
+    /* Forms */
+    .form-check-label {
+        font-size: 0.9rem;
+    }
+
+    /* Footer */
+    footer .row>.col-md-4 {
+        margin-bottom: 20px;
+    }
+}

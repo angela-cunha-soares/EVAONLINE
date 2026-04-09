@@ -1,0 +1,152 @@
+# ===========================================
+# PRE-COMMIT HOOKS - EVAonline
+# Updated to use pyproject.toml
+# ===========================================
+
+default_language_version:
+  python: python3.12
+
+repos:
+  # ===========================================
+  # Python Code Formatting
+  # ===========================================
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        language_version: python3.12
+        args: ["--line-length=100"]
+        exclude: |
+          (?x)^(
+              docs/archive/.*|
+              .venv/.*|
+              venv/.*|
+              migrations/.*|
+              alembic/versions/.*
+          )$
+
+  # ===========================================
+  # Import Organization
+  # ===========================================
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--line-length", "100"]
+        exclude: |
+          (?x)^(
+              docs/archive/.*|
+              .venv/.*|
+              venv/.*|
+              migrations/.*|
+              alembic/versions/.*
+          )$
+
+  # ===========================================
+  # Ruff
+  # ===========================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.2
+    hooks:
+      - id: ruff
+        args: ["--fix", "--show-fixes"]
+        exclude: |
+          (?x)^(
+              docs/archive/.*|
+              .venv/.*|
+              venv/.*|
+              migrations/.*|
+              alembic/versions/.*
+          )$
+
+  # ===========================================
+  # Type Checking (Mypy)
+  # ===========================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+
+  # ===========================================
+  # Security - Detect Secrets
+  # ===========================================
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        exclude: |
+          (?x)^(
+              .*\.lock$|
+              .*\.yarn/.*|
+              node_modules/.*|
+              .venv/.*|
+              venv/.*|
+              \.env.*|
+              alembic/versions/.*
+          )$
+
+  # ===========================================
+  # Hooks
+  # ===========================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: |
+          (?x)^(
+              .*\.md$|
+              docs/.*
+          )$
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+              .*\.md$|
+              docs/.*
+          )$
+      - id: check-yaml
+        args: ["--unsafe"]
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: requirements-txt-fixer
+        # UPDATE: Rename to reflect pyproject.toml
+        name: Check requirements files (legacy)
+
+  # ===========================================
+  # Docker
+  # ===========================================
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: ["--ignore", "DL3008", "--ignore", "DL3013"]
+
+  # ===========================================
+  # YAML Linting
+  # ===========================================
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ["-d", "{extends: default, rules: {line-length: {max: 120}}}"]
+        exclude: |
+          (?x)^(
+              docker-compose.*\.yml$|
+              .github/workflows/.*
+          )$
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+  autofix_prs: true
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

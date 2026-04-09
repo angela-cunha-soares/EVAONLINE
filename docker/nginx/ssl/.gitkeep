@@ -1,0 +1,14 @@
+# SSL Certificate Placeholder
+# ============================
+# Place your SSL certificates in this directory:
+#   - fullchain.pem  (certificate + intermediate CA)
+#   - privkey.pem    (private key)
+#
+# For Let's Encrypt (production):
+#   certbot certonly --standalone -d your-domain.com
+#   cp /etc/letsencrypt/live/your-domain.com/fullchain.pem ./
+#   cp /etc/letsencrypt/live/your-domain.com/privkey.pem ./
+#
+# Then uncomment the SSL lines in:
+#   - docker-compose.yml (port 443)
+#   - docker/nginx/nginx.conf (ssl_certificate directives)

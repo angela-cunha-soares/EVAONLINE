@@ -1,0 +1,90 @@
+# =============================================================================
+# PROMETHEUS CONFIGURATION - EVAonline
+# Monitors: API metrics, Flower (Celery), and self
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    environment: "production"
+    cluster: "evaonline"
+
+# Scrape configurations
+scrape_configs:
+  # ---------------------------------------------------------
+  # Prometheus self-monitoring
+  # ---------------------------------------------------------
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: "prometheus"
+    metrics_path: /metrics
+
+  # ---------------------------------------------------------
+  # EVAonline API (FastAPI + prometheus_client /metrics)
+  # ---------------------------------------------------------
+  - job_name: "evaonline-api"
+    static_configs:
+      - targets: ["api:8000"]
+        labels:
+          service: "evaonline-api"
+          component: "backend"
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+
+  # ---------------------------------------------------------
+  # Flower (Celery monitoring) — served at /flower/metrics
+  # ---------------------------------------------------------
+  - job_name: "flower"
+    static_configs:
+      - targets: ["flower:5555"]
+        labels:
+          service: "flower"
+          component: "celery-monitoring"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    metrics_path: /flower/metrics
+
+  # ---------------------------------------------------------
+  # PostgreSQL Exporter
+  # ---------------------------------------------------------
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: "postgres"
+    scrape_timeout: 10s
+
+  # ---------------------------------------------------------
+  # Redis Exporter
+  # ---------------------------------------------------------
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels:
+          service: "redis"
+    scrape_timeout: 10s
+
+  # ---------------------------------------------------------
+  # Blackbox Exporter (HTTP probes for health checks)
+  # ---------------------------------------------------------
+  - job_name: "evaonline-blackbox"
+    metrics_path: /probe
+    params:
+      module: [http_health]
+    static_configs:
+      - targets:
+          - "http://api:8000/health"
+          - "http://flower:5555/flower/healthcheck"
+          - "http://grafana:3000/grafana/api/health"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

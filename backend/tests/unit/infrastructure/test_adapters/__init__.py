@@ -1,0 +1,1 @@
+"""External Adapters Tests (Unit)"""

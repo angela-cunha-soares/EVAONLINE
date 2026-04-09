@@ -1,0 +1,55 @@
+# ===========================================
+# docker-compose.override.example.yml
+# ===========================================
+# EXEMPLO de configuração local para desenvolvimento e testes
+#
+# COMO USAR:
+# 1. Copie este arquivo: cp docker-compose.override.example.yml docker-compose.override.yml
+# 2. Ajuste as configurações conforme sua necessidade
+# 3. Execute: docker compose up -d
+#
+# O Docker Compose automaticamente combina:
+#   - docker-compose.yml (configuração base)
+#   - docker-compose.override.yml (suas customizações locais)
+#
+# NOTA: docker-compose.override.yml está no .gitignore
+#       Cada desenvolvedor pode ter configurações diferentes
+# ===========================================
+
+services:
+  # PostgreSQL simplificado (autenticação MD5 padrão)
+  postgres:
+    image: postgres:16-alpine
+    container_name: evaonline-postgres-test
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-evaonline_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_123}
+      POSTGRES_DB: ${POSTGRES_DB:-evaonline_dev}
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    # Comando padrão sem modificações problemáticas
+    command: postgres -c 'max_connections=200' -c 'shared_buffers=256MB'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-evaonline}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis simplificado
+  redis:
+    image: redis:7-alpine
+    container_name: evaonline-redis-test
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_test_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_test_data:
+  redis_test_data:
