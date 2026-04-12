@@ -1,6 +1,6 @@
 # Code of Conduct
 
-This project adopts the [Contributor Covenant](https://www.contributor-covenant.org/pt-br/version/2/1/code_of_conduct/) as its code of conduct.
+This project adopts the [Contributor Covenant](https://github.com/angela-cunha-soares/EVAONLINE/blob/main/CODE_OF_CONDUCT.md) as its code of conduct.
 
 **Quick summary:**
 - Be respectful, inclusive, and constructive.  
