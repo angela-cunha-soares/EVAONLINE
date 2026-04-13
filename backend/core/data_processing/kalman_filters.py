@@ -192,7 +192,10 @@ class KalmanApplier:
             df["eto_final"] = np.round(result, 3)
             df["anomaly_eto_mm"] = np.round(anomaly, 3)
         else:
-            kalman = SimpleKalmanFilter(initial_value=5.0)
+            # Use data mean as initial value instead of hardcoded 5.0
+            data_mean = df["et0_mm"].dropna().mean()
+            initial_value = max(0.5, min(float(data_mean) if pd.notna(data_mean) else 5.0, 15.0))
+            kalman = SimpleKalmanFilter(initial_value=initial_value)
             result = kalman.update_batch(df["et0_mm"].values)
             df["eto_final"] = np.round(result, 3)
             df["anomaly_eto_mm"] = np.nan

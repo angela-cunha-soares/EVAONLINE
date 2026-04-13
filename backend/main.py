@@ -10,33 +10,8 @@ from backend.api.websocket.websocket_service import router as websocket_router
 from config.logging_config import get_logger, setup_logging
 
 from config.settings.app_config import get_legacy_settings
-from math import radians, sin, cos, sqrt, atan2
 
 # Configurar logging avançado
-def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Calculates the approximate distance between two points (Haversine).
-
-    Args:
-        lat1: Latitude of point 1
-        lon1: Longitude of point 1
-        lat2: Latitude of point 2
-        lon2: Longitude of point 2
-
-    Returns:
-        Distance in meters
-    """
-
-    R = 6371000  # Earth's radius in meters
-    
-    lat1_rad = radians(lat1)
-    lat2_rad = radians(lat2)
-    delta_lat = radians(lat2 - lat1)
-    delta_lon = radians(lon2 - lon1)
-    
-    a = sin(delta_lat / 2) ** 2 + cos(lat1_rad) * cos(lat2_rad) * sin(delta_lon / 2) ** 2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    
-    return R * c
 setup_logging(log_level="INFO", log_dir="logs", json_logs=False)
 logger = get_logger()
 

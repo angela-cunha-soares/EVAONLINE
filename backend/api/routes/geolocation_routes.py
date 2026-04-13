@@ -12,7 +12,7 @@ from backend.core.analytics.geolocation_service import GeolocationService
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/geolocation", tags=["Geolocation"])
+router = APIRouter(prefix="/geolocation", tags=["Geolocation"])
 
 
 class GeolocationRequest(BaseModel):
