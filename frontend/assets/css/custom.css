@@ -625,8 +625,9 @@ small {
 }
 
 .navbar-brand-icon {
-    font-size: 2.8rem;
-    color: var(--color-primary);
+    height: 2.8rem;
+    width: auto;
+    vertical-align: middle;
 }
 
 .navbar-brand-title {
@@ -1647,7 +1648,7 @@ footer.bg-white {
     }
 
     .navbar-brand-icon {
-        font-size: 1.8rem !important;
+        height: 1.8rem !important;
     }
 
     #navbar-toggler {

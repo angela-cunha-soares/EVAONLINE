@@ -10,7 +10,8 @@
         "architecture": "ARQUITETURA",
         "about": "SOBRE",
         "github": "GITHUB",
-        "language_button": "ENGLISH"
+        "language_button": "ENGLISH",
+        "subtitle": "Evapotranspiração de Referência · Fusão Multi-Fonte · FAO-56 PM"
     },
     "sidebar": {
         "title": "Calculadora ETo",

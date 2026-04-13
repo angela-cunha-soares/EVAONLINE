@@ -10,7 +10,8 @@
         "architecture": "ARCHITECTURE",
         "about": "ABOUT",
         "github": "GITHUB",
-        "language_button": "PORTUGUÊS"
+        "language_button": "PORTUGUÊS",
+        "subtitle": "Reference Evapotranspiration · Multi-Source Fusion · FAO-56 PM"
     },
     "sidebar": {
         "title": "ETo Calculator",

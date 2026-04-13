@@ -65,6 +65,7 @@ def toggle_language(n_clicks, current_language):
     Output("nav-documentation", "children"),
     Output("nav-architecture", "children"),
     Output("nav-about", "children"),
+    Output("navbar-subtitle", "children"),
     Input("language-store", "data"),
 )
 def translate_navbar_links(lang):
@@ -87,6 +88,7 @@ def translate_navbar_links(lang):
         t(lang, "navbar", "documentation", default="DOCUMENTATION"),
         t(lang, "navbar", "architecture", default="ARCHITECTURE"),
         t(lang, "navbar", "about", default="ABOUT"),
+        t(lang, "navbar", "subtitle", default="Reference Evapotranspiration · Multi-Source Fusion · FAO-56 PM"),
     )
 
 
