@@ -10,6 +10,7 @@ from backend.api.websocket.websocket_service import router as websocket_router
 from config.logging_config import get_logger, setup_logging
 
 from config.settings.app_config import get_legacy_settings
+from math import radians, sin, cos, sqrt, atan2
 
 # Configurar logging avançado
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -173,7 +174,6 @@ app = mount_dash(app)
 
 if __name__ == "__main__":
     import uvicorn
-from math import radians, sin, cos, sqrt, atan2
 
     # uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=settings.DEBUG)
     uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)

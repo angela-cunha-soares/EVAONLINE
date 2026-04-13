@@ -1,5 +1,5 @@
 """
-⚠️ DEPRECATED: Use config.logging_config instead.
+DEPRECATED: Use config.logging_config instead.
 
 This module is kept for backward compatibility only.
 New code should use:

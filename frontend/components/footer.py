@@ -237,7 +237,7 @@ def create_footer(lang: str = "en") -> html.Footer:
                                                     ],
                                                     href=(
                                                         "https://github.com/"
-                                                        "angelacunhasoares/"
+                                                        "angela-cunha-soares/"
                                                         "EVAONLINE"
                                                     ),
                                                     target="_blank",
@@ -258,7 +258,7 @@ def create_footer(lang: str = "en") -> html.Footer:
                                                     ],
                                                     href=(
                                                         "https://github.com/"
-                                                        "angelacunhasoares/"
+                                                        "angela-cunha-soares/"
                                                         "EVAONLINE/blob/main/"
                                                         "LICENSE"
                                                     ),
@@ -378,7 +378,7 @@ def create_footer(lang: str = "en") -> html.Footer:
                                             ),
                                             html.A(
                                                 "AGPLv3",
-                                                href="https://github.com/angelacunhasoares/EVAONLINE/blob/main/LICENSE",
+                                                href="https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE",
                                                 target="_blank",
                                                 rel="noopener noreferrer",
                                                 className="footer-license-link",

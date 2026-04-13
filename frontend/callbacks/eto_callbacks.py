@@ -3272,7 +3272,7 @@ def download_table_stats(csv_n, excel_n, results_data, lang_data):
     prevent_initial_call=True,
 )
 def download_table_eto_summary(csv_n, excel_n, results_data, lang_data):
-    """Download da tabela ETo Summary / Water Balance."""
+    """Download da tabela ETo Summary / Water Deficit."""
     if not results_data or not (csv_n or excel_n):
         return no_update
 

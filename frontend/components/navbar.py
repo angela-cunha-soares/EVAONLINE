@@ -100,7 +100,7 @@ def create_navbar():
                                             ),
                                             "GITHUB",
                                         ],
-                                        href="https://github.com/evaonlineplatform/EVAONLINE",
+                                        href="https://github.com/angela-cunha-soares/EVAONLINE",
                                         target="_blank",
                                         id="nav-github",
                                         className="nav-link-academic nav-link-github",
