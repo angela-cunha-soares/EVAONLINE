@@ -42,7 +42,8 @@ LABEL stage="builder-dev"
 
 # Install development dependencies from pyproject.toml
 # [dev] refers to the project.optional-dependencies section in pyproject.toml
-RUN pip install --no-cache-dir --user .[dev]
+RUN pip install --no-cache-dir --target /dependencies-dev -r requirements.txt && \
+    pip install --no-cache-dir --target /dependencies-dev .[dev]
 
 # ===========================================
 # Stage 2: Runtime (Production)

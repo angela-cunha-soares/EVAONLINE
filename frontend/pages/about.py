@@ -33,7 +33,7 @@ _DEVELOPERS = [
         "short": "Ângela S. M. C. Soares",
         "orcid": "0000-0002-1253-7193",
         "institution": "ESALQ/USP",
-        "email": "angelassilviane@gmail.com",
+        "email": "angelasilviane@alumni.usp.br",
         "role_key": "author_role_angela",
     },
     {
@@ -57,7 +57,7 @@ _DEVELOPERS = [
 _ARTICLE_AUTHORS = [
     {
         "name": "Ângela Silviane Moura Cunha Soares",
-        "email": "angelassilviane@gmail.com",
+        "email": "angelasilviane@alumni.usp.br",
         "affiliation_key": "affiliation_usp",
         "corresponding": True,
     },
@@ -117,19 +117,19 @@ _PARTNERS = [
 _DATA_SOURCES = [
     {
         "name": "NASA POWER",
-        "resolution": "0.5° × 0.625° (~55 km)",
+        "resolution": "0.5° x 0.625° (~55 km)",
         "period_key": "ds_period_nasa",
         "type_key": "ds_type_reanalysis",
     },
     {
         "name": "Open-Meteo Archive",
-        "resolution": "0.1° (~10 km)",
+        "resolution": "0.1° x 0.1° (~10 km)",
         "period_key": "ds_period_openmeteo",
         "type_key": "ds_type_reanalysis",
     },
     {
         "name": "Open-Meteo Forecast",
-        "resolution": "0.1° (~10 km)",
+        "resolution": "0.1° x 0.1° (~10 km)",
         "period_key": "ds_period_forecast",
         "type_key": "ds_type_forecast",
     },
@@ -1000,7 +1000,7 @@ def _create_license_section(lang="en"):
                                                 html.I(className="bi bi-box-arrow-up-right me-1"),
                                                 _t(lang, "license_view", default="View License"),
                                             ],
-                                            href="https://github.com/angelacunhasoares/EVAONLINE/blob/main/LICENSE",
+                                            href="https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE",
                                             target="_blank",
                                             rel="noopener noreferrer",
                                             className="btn btn-outline-secondary btn-sm",
@@ -1044,7 +1044,7 @@ def _create_license_section(lang="en"):
                                                 html.I(className="bi bi-github me-1"),
                                                 _t(lang, "repo_view", default="View on GitHub"),
                                             ],
-                                            href="https://github.com/angelacunhasoares/EVAONLINE",
+                                            href="https://github.com/angela-cunha-soares/EVAONLINE",
                                             target="_blank",
                                             rel="noopener noreferrer",
                                             className="btn btn-outline-dark btn-sm",

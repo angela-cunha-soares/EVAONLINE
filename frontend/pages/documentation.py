@@ -2282,7 +2282,7 @@ def _create_license_section(lang):
                                             _t(lang, "license_full_text"),
                                             html.A(
                                                 _t(lang, "license_repo"),
-                                                href="https://github.com/evaonlineplatform/EVAONLINE/blob/main/LICENSE",
+                                                href="https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE",
                                                 target="_blank",
                                                 className="text-primary",
                                             ),

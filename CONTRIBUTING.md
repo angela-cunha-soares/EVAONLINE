@@ -8,7 +8,7 @@ Contributions of any kind are welcome: bug fixes, new features, documentation im
 
 1. **Read the [README.md](README.md)** – it contains installation instructions, how to run the project locally, and an overview of the project.
 
-2. **Search the [open issues](https://github.com/angelacunhasoares/EVAONLINE/issues)** – check if what you want to do is already being discussed. If not, **open a new issue** describing the problem or idea (use the available templates, if any).
+2. **Search the [open issues](https://github.com/angela-cunha-soares/EVAONLINE/issues)** – check if what you want to do is already being discussed. If not, **open a new issue** describing the problem or idea (use the available templates, if any).
 
 3. **Discuss before starting** – comment on the issue to align expectations. This avoids duplicate work and increases the chances of your pull request being accepted.
 

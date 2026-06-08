@@ -183,8 +183,8 @@ production = [
 ]
 
 [project.urls]
-Repository = "https://github.com/angelacunhasoares/EVAONLINE"
-"Issue Tracker" = "https://github.com/angelacunhasoares/EVAONLINE/issues"
+Repository = "https://github.com/angela-cunha-soares/EVAONLINE"
+"Issue Tracker" = "https://github.com/angela-cunha-soares/EVAONLINE/issues"
 
 # ===========================================
 # ENTRY POINTS

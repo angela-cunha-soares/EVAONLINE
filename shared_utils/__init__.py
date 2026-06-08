@@ -1,7 +1,7 @@
 from .logging import configure_logging
 from .websocket_client import DashWebSocketManager, MessageType, WebSocketClient, WebSocketMessage
 
-configure_logging()  # Configura o logging automaticamente
+configure_logging()
 
 __all__ = [
     "configure_logging",

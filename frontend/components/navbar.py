@@ -24,8 +24,9 @@ def create_navbar():
                                     [
                                         html.Div(
                                             [
-                                                html.I(
-                                                    className="bi bi-droplet-fill me-2 navbar-brand-icon",
+                                                html.Img(
+                                                    src="/assets/images/icon_evaonline.svg",
+                                                    className="me-2 navbar-brand-icon",
                                                 ),
                                                 html.Span(
                                                     "EVAonline",
@@ -35,7 +36,8 @@ def create_navbar():
                                             className="navbar-brand-header",
                                         ),
                                         html.Div(
-                                            "An open-source web platform for global reference evapotranspiration estimation via multi-source data fusion",
+                                            "Reference Evapotranspiration · Multi-Source Fusion · FAO-56 PM",
+                                            id="navbar-subtitle",
                                             className="navbar-brand-subtitle",
                                         ),
                                     ],
@@ -100,7 +102,7 @@ def create_navbar():
                                             ),
                                             "GITHUB",
                                         ],
-                                        href="https://github.com/evaonlineplatform/EVAONLINE",
+                                        href="https://github.com/angela-cunha-soares/EVAONLINE",
                                         target="_blank",
                                         id="nav-github",
                                         className="nav-link-academic nav-link-github",

@@ -151,7 +151,7 @@ We validated EVAonline against the **BR‑DWGD** gridded dataset (1991–2020) a
 
 ```bash
 # 1. Clone
-git clone https://github.com/angelacunhasoares/EVAONLINE.git
+git clone https://github.com/angela-cunha-soares/EVAONLINE
 cd EVAONLINE
 
 # 2. Configure environment
@@ -249,11 +249,11 @@ This independent validation package contains 186,287 daily observations from 17 
 
 ## 📄 License
 
-This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0). See the [LICENSE](https://github.com/angelacunhasoares/EVAONLINE/blob/main/LICENSE) file for details.
+This project is licensed under the **GNU Affero General Public License v3.0** (AGPL-3.0). See the [LICENSE](https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE) file for details.
 
 ---
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/angelacunhasoares/EVAONLINE/issues)
-- **Contact**: angelassilviane@gmail.com | angelasilviane@alumni.usp.br
+- **Issues**: [GitHub Issues](https://github.com/angela-cunha-soares/EVAONLINE/issues)
+- **Contact**: angelasilviane@alumni.usp.br | angelassilviane@gmail.com

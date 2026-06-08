@@ -274,15 +274,38 @@ async def get_location_info(request: LocationInfoRequest) -> Dict[str, Any]:
     Informações de localização (timezone, elevação).
     """
     try:
-        # TODO: Implementar busca real de timezone e elevação
-        # Por enquanto, retorna estrutura básica
+        from timezonefinderL import TimezoneFinder
+
+        tf = TimezoneFinder()
+        tz_name = tf.timezone_at(lat=request.lat, lng=request.lng)
+
+        # Fallback: If over ocean or unmapped area
+        if not tz_name:
+            tz_name = "UTC"
+
+        # Try to get elevation from OpenTopo
+        elevation_m = None
+        try:
+            from backend.api.services.opentopo.opentopo_sync_adapter import (
+                OpenTopoSyncAdapter,
+            )
+
+            topo = OpenTopoSyncAdapter()
+            result = topo.get_elevation_sync(
+                lat=request.lat, lon=request.lng
+            )
+            if result and result.elevation is not None:
+                elevation_m = result.elevation
+        except Exception as elev_err:
+            logger.warning(f"Elevation lookup failed: {elev_err}")
+
         return {
             "status": "success",
             "location": {
                 "lat": request.lat,
                 "lng": request.lng,
-                "timezone": "America/Sao_Paulo",  # Placeholder
-                "elevation_m": None,  # Placeholder
+                "timezone": tz_name,
+                "elevation_m": elevation_m,
             },
             "timestamp": time.time(),
         }
