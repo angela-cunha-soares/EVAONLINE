@@ -1,0 +1,7 @@
+key,label,kge,pbias,delta_kge,delta_pbias
+baseline,Baseline (full EVAonline),0.8123,0.3606,0.0,0.0
+A1,A1: $R_s$ from Open-Meteo only (no CERES weight),0.756,0.5106,-0.0563,0.15
+A2,A2: $R_s$ replaced by climatology,0.6372,-0.4107,-0.1751,-0.7713
+A3,A3: no climatological bias correction,0.7217,10.8653,-0.0906,10.5047
+A4,A4: no adaptive outlier rejection,0.8094,-0.003,-0.0029,-0.3636
+A5,A5: no dynamic $Q$ adaptation,0.7062,0.2151,-0.1061,-0.1455
