@@ -1,0 +1,55 @@
+name: Criar VM ARM Oracle
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+      OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+    steps:
+      - name: Instalar OCI CLI
+        run: |
+          curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o install.sh
+          bash install.sh --accept-all-defaults >/dev/null
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Tentar criar a VM
+        run: |
+          C="${{ secrets.OCI_CLI_TENANCY }}"
+          SUBNET="ocid1.subnet.oc1.sa-saopaulo-1.aaaaaaaarl7ii6jlweguwmeit73kuiv37liye5nfp3dimhowm3iedpjajrea"
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /tmp/key.pub
+
+          AD=$(oci iam availability-domain list --compartment-id "$C" --query 'data[0].name' --raw-output)
+          IMG=$(oci compute image list --compartment-id "$C" --operating-system "Canonical Ubuntu" --operating-system-version "22.04" --shape "VM.Standard.A1.Flex" --sort-by TIMECREATED --query 'data[0].id' --raw-output)
+
+          EXIST=$(oci compute instance list --compartment-id "$C" --display-name "evaonline-server" --lifecycle-state RUNNING --query 'data[0].id' --raw-output 2>/dev/null)
+          if [ -n "$EXIST" ] && [ "$EXIST" != "null" ]; then
+            echo "A VM ja existe e esta RUNNING: $EXIST"
+            exit 0
+          fi
+
+          OUT=$(oci compute instance launch \
+            --availability-domain "$AD" --compartment-id "$C" \
+            --shape "VM.Standard.A1.Flex" --shape-config '{"ocpus":4,"memoryInGBs":24}' \
+            --image-id "$IMG" --subnet-id "$SUBNET" --assign-public-ip true \
+            --display-name "evaonline-server" \
+            --ssh-authorized-keys-file /tmp/key.pub \
+            --boot-volume-size-in-gbs 100 2>&1) || true
+
+          echo "$OUT" | grep -Ei '"id"|"code"|"message"|"lifecycle-state"' || true
+
+          if echo "$OUT" | grep -qi '"id"'; then
+            echo "🎉 SUCESSO! A VM esta sendo criada."
+          elif echo "$OUT" | grep -qi "capacity"; then
+            echo "Sem capacidade agora. Tenta de novo no proximo ciclo."
+          else
+            echo "Erro diferente (ver acima)."
+          fi
