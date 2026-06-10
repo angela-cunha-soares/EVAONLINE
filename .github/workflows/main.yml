@@ -25,7 +25,7 @@ jobs:
         run: |
           C="${{ secrets.OCI_CLI_TENANCY }}"
           SUBNET="ocid1.subnet.oc1.sa-saopaulo-1.aaaaaaaarl7ii6jlweguwmeit73kuiv37liye5nfp3dimhowm3iedpjajrea"
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > /tmp/key.pub
+          echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBzlsFtS/JvjJ8PX5C3k/p1AA4GJwOAI5hGN3CG7jbIHyuylXl6ObcGFm2CqQIMvtcskIRQaPMPijuHWGQlH3fG8dQiGCbGMoDk4KmDBt5ni177I+qKX/1ChsSuhpV8aGoXH8m6sjaa8DbRbNunHduq8Gm/uxfNaBVfUJ2tmVJHpQ2eMxfu0U8QXDctDxBJKhkSM5RASGLbUGjNvX92GkD1Ok3XhUA7lhBm+cI1xZg8uQgz8inBH+c9yPZ0rmgi0OFwZkkUuuJy9knasMQVzQUUGEkwCKSlYia8w5MyaaVtD2vcPdQuNiJbxQuaJ95I8OLA9ifeS+de1+MJs+Cwuyj angelassil@54ebc6d8a9f9" > /tmp/key.pub
 
           AD=$(oci iam availability-domain list --compartment-id "$C" --query 'data[0].name' --raw-output)
           IMG=$(oci compute image list --compartment-id "$C" --operating-system "Canonical Ubuntu" --operating-system-version "22.04" --shape "VM.Standard.A1.Flex" --sort-by TIMECREATED --query 'data[0].id' --raw-output)
