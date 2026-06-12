@@ -36,20 +36,32 @@ jobs:
             exit 0
           fi
 
-          OUT=$(oci compute instance launch \
-            --availability-domain "$AD" --compartment-id "$C" \
-            --shape "VM.Standard.A1.Flex" --shape-config '{"ocpus":4,"memoryInGBs":24}' \
-            --image-id "$IMG" --subnet-id "$SUBNET" --assign-public-ip true \
-            --display-name "evaonline-server" \
-            --ssh-authorized-keys-file /tmp/key.pub \
-            --boot-volume-size-in-gbs 100 2>&1) || true
+          CREATED=0
+          for CONFIG in "4 24" "2 12"; do
+            set -- $CONFIG
+            OCPUS=$1; MEM=$2
+            echo "=========================================="
+            echo ">> Tentando $OCPUS OCPU / $MEM GB ..."
+            OUT=$(oci compute instance launch \
+              --availability-domain "$AD" --compartment-id "$C" \
+              --shape "VM.Standard.A1.Flex" --shape-config "{\"ocpus\":$OCPUS,\"memoryInGBs\":$MEM}" \
+              --image-id "$IMG" --subnet-id "$SUBNET" --assign-public-ip true \
+              --display-name "evaonline-server" \
+              --ssh-authorized-keys-file /tmp/key.pub \
+              --boot-volume-size-in-gbs 100 2>&1) || true
 
-          echo "$OUT" | grep -Ei '"id"|"code"|"message"|"lifecycle-state"' || true
+            if echo "$OUT" | grep -qi '"id"'; then
+              echo "🎉 SUCESSO! VM criada com $OCPUS OCPU / $MEM GB."
+              CREATED=1
+              break
+            elif echo "$OUT" | grep -qi "capacity"; then
+              echo "   Sem capacidade para $OCPUS/$MEM. Tentando a proxima opcao..."
+            else
+              echo "   Erro diferente em $OCPUS/$MEM:"
+              echo "$OUT" | grep -Ei '"code"|"message"' | head -3
+            fi
+          done
 
-          if echo "$OUT" | grep -qi '"id"'; then
-            echo "🎉 SUCESSO! A VM esta sendo criada."
-          elif echo "$OUT" | grep -qi "capacity"; then
-            echo "Sem capacidade agora. Tenta de novo no proximo ciclo."
-          else
-            echo "Erro diferente (ver acima)."
+          if [ "$CREATED" = "0" ]; then
+            echo "Nenhuma opcao teve capacidade agora. Tenta de novo no proximo ciclo."
           fi
