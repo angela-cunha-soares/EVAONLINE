@@ -37,7 +37,7 @@ jobs:
           fi
 
           CREATED=0
-          for CONFIG in "4 24" "2 12"; do
+          for CONFIG in "4 24" "2 12" "1 6"; do
             set -- $CONFIG
             OCPUS=$1; MEM=$2
             echo "=========================================="
