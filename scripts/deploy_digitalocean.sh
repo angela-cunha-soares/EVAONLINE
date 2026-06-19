@@ -97,7 +97,7 @@ if [ -d "$APP_DIR" ]; then
     cd "$APP_DIR"
     git pull origin main
 else
-    git clone https://github.com/angelacunhasoares/EVAONLINE.git "$APP_DIR"
+    git clone https://github.com/angela-cunha-soares/EVAONLINE.git "$APP_DIR"
     cd "$APP_DIR"
 fi
 
@@ -186,8 +186,8 @@ EXTERNAL_API_MAX_RETRIES=3
 EXTERNAL_API_RETRY_DELAY=1.0
 
 # USER AGENTS
-MET_NORWAY_USER_AGENT=EVAonline/1.0 (https://github.com/angelacunhasoares/EVAONLINE)
-NWS_USER_AGENT=(EVAonline/1.0, https://github.com/angelacunhasoares/EVAONLINE)
+MET_NORWAY_USER_AGENT=EVAonline/1.0 (https://github.com/angela-cunha-soares/EVAONLINE)
+NWS_USER_AGENT=(EVAonline/1.0, https://github.com/angela-cunha-soares/EVAONLINE)
 
 # MONITORAMENTO
 PROMETHEUS_ENABLED=True
@@ -333,7 +333,7 @@ log_ok "Docker services started"
 log_info "Step 8/9: Obtaining SSL certificate from Let's Encrypt..."
 
 DOMAIN="evaonline.app.br"
-EMAIL="your-email@example.com"  # Change to your real email
+EMAIL="angelassilviane@gmail.com"  # Change to your real email
 
 # Install certbot if not present
 if ! command -v certbot &> /dev/null; then
