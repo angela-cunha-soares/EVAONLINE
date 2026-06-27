@@ -1,0 +1,29 @@
+name: 🔔 Notificar contribuições no Discord
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+
+permissions:
+  contents: read
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar mensagem para o Discord
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          nofail: true
+          title: "Nova contribuição no repositório ${{ github.repository }}"
+          description: |
+            **Evento:** ${{ github.event_name }}
+            **Autor:** ${{ github.actor }}
+            **Commit:** ${{ github.event.head_commit.message || github.event.pull_request.title }}
+            [Ver alterações](${{ github.event.compare || github.event.pull_request.html_url }})
+          color: 0x00ff00
+          username: GitHub Bot
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
