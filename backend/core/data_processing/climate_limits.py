@@ -34,7 +34,7 @@ GLOBAL_LIMITS_VALIDATION = {
     "T2M_MIN": (-90, 60, "neither"),
     "T2M": (-90, 60, "neither"),
     "RH2M": (0, 100, "both"),
-    "WS2M": (0, 113, "left"),
+    "WS2M": (0, 120, "left"),
     "PRECTOTCORR": (0, 2000, "left"),
     "ALLSKY_SFC_SW_DWN": (0, 35, "left"),
     # ─────────────────────────────────────────────────────────────
@@ -46,8 +46,8 @@ GLOBAL_LIMITS_VALIDATION = {
     "relative_humidity_2m_max": (0, 100, "both"),
     "relative_humidity_2m_mean": (0, 100, "both"),
     "relative_humidity_2m_min": (0, 100, "both"),
-    "wind_speed_10m_max": (0, 113, "left"),
-    "wind_speed_10m_mean": (0, 113, "left"),
+    "wind_speed_10m_max": (0, 120, "left"),
+    "wind_speed_10m_mean": (0, 120, "left"),
     "shortwave_radiation_sum": (0, 35, "left"),
     "daylight_duration": (0, 24, "both"),
     "sunshine_duration": (0, 24, "both"),
@@ -62,7 +62,7 @@ GLOBAL_LIMITS_VALIDATION = {
     # ─────────────────────────────────────────────────────────────
     # NWS
     # ─────────────────────────────────────────────────────────────
-    "wind_speed_ms": (0, 113, "left"),
+    "wind_speed_ms": (0, 120, "left"),
     "precipitation_mm": (0, 2000, "left"),
 }
 
@@ -72,9 +72,9 @@ GLOBAL_LIMITS_VALIDATION = {
 # - Outlier detection durante fusão
 # - Interpolação segura
 GLOBAL_LIMITS_FUSION = {
-    "T2M_MAX": (-50.0, 60.0),  # Death Valley 2021: 56.7°C
-    "T2M_MIN": (-90.0, 40.0),  # Vostok 1983: -89.2°C
-    "T2M": (-90.0, 58.0),
+    "T2M_MAX": (-90.0, 60.0),  # Death Valley 2021: 56.7°C
+    "T2M_MIN": (-90.0, 60.0),  # Vostok 1983: -89.2°C
+    "T2M": (-90.0, 60.0),
     "RH2M": (0.0, 100.0),  # Fisicamente impossível >100%
     "WS2M": (0.0, 120.0),  # Tornado Bridge Creek 1999: 113.3 m/s
     "ALLSKY_SFC_SW_DWN": (0.0, 35.0),  # BOM Australia
@@ -96,7 +96,9 @@ BRAZIL_LIMITS_VALIDATION = {
     "RH2M": (0, 100, "left"),
     "WS2M": (0, 100, "left"),
     "PRECTOTCORR": (0, 450, "left"),
-    "ALLSKY_SFC_SW_DWN": (0, 40, "left"),
+    # Solar radiation (ALLSKY_SFC_SW_DWN) is NOT bounded by a fixed cap here:
+    # for Brazil it is validated against extraterrestrial radiation
+    # (0.03*Ra <= Rs < Ra; Moradi et al., 2009) in data_preprocessing.py.
     # Open-Meteo Archive/Forecast
     "temperature_2m_max": (-30, 50, "left"),
     "temperature_2m_min": (-30, 50, "left"),
@@ -106,7 +108,8 @@ BRAZIL_LIMITS_VALIDATION = {
     "relative_humidity_2m_min": (0, 100, "left"),
     "wind_speed_10m_max": (0, 100, "left"),
     "wind_speed_10m_mean": (0, 100, "left"),
-    "shortwave_radiation_sum": (0, 40, "left"),
+    # shortwave_radiation_sum (solar) validated via 0.03*Ra <= Rs < Ra
+    # (Moradi et al., 2009) in data_preprocessing.py, not a fixed cap.
     "daylight_duration": (0, 24, "both"),
     "sunshine_duration": (0, 24, "both"),
     "precipitation_sum": (0, 450, "left"),

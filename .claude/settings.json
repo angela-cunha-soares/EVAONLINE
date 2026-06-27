@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile core/data_processing/climate_limits.py core/data_processing/data_preprocessing.py)",
+      "Bash(python -m pytest tests/unit/domain/test_data_preprocessing.py tests/unit/domain/test_data_preprocessing_comprehensive.py -q)"
+    ]
+  }
+}

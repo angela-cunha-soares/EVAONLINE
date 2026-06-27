@@ -28,15 +28,6 @@ def data_initial_validate(
     """
     Validates weather data based on physical limits.
 
-    Physical limits follow scientific literature:
-    - **Brazil** (Xavier et al. 2016, 2022):
-      - 0 mm ≤ precipitation < 450 mm
-      - 0.03Ra ≤ solar_radiation < Ra
-      - 0 m/s ≤ wind_speed < 100 m/s
-      - -30°C < temperature_max, temperature_min < 50°C
-    - **Global** (conservative world limits):
-      - More relaxed ranges based on world records
-
     Args:
         weather_df (pd.DataFrame): Weather data with index as datetime and
             columns T2M_MAX, T2M_MIN, T2M, RH2M, WS2M, ALLSKY_SFC_SW_DWN,
@@ -162,27 +153,31 @@ def data_initial_validate(
                 logger.warning(warnings[-1])
             weather_df[col] = weather_df[col].where(~invalid_mask, np.nan)
 
-    # Validate solar radiation against extraterrestrial radiation (0.03*Ra to Ra)
+    # Validate solar radiation against extraterrestrial radiation
+    # (0.03*Ra <= Rs < Ra). Brazil-only QC (Moradi et al., 2009); the global
+    # application relies on the fixed 0-35 MJ/m²/day cap from
+    # GLOBAL_LIMITS_VALIDATION applied in the loop above instead.
     # NASA POWER: ALLSKY_SFC_SW_DWN (MJ/m²/day)
     # Open-Meteo: shortwave_radiation_sum (MJ/m²/day after unit conversion)
-    radiation_cols = ["ALLSKY_SFC_SW_DWN", "shortwave_radiation_sum"]
-    for rad_col in radiation_cols:
-        if rad_col in weather_df.columns:
-            # Validate against physical limits (0.03*Ra to Ra)
-            invalid_rad_mask = ~weather_df[rad_col].between(
-                0.03 * weather_df["Ra"], weather_df["Ra"], inclusive="left"
-            )
-            invalid_count = invalid_rad_mask.sum()
-            if invalid_count > 0:
-                percent_invalid = (invalid_count / len(weather_df)) * 100
-                warnings.append(
-                    f"Invalid values in {rad_col}: {invalid_count} records "
-                    f"({percent_invalid:.2f}%) replaced with NaN."
+    if region.lower() == "brazil":
+        radiation_cols = ["ALLSKY_SFC_SW_DWN", "shortwave_radiation_sum"]
+        for rad_col in radiation_cols:
+            if rad_col in weather_df.columns:
+                # Validate against physical limits (0.03*Ra to Ra)
+                invalid_rad_mask = ~weather_df[rad_col].between(
+                    0.03 * weather_df["Ra"], weather_df["Ra"], inclusive="left"
                 )
-                logger.warning(warnings[-1])
-            weather_df[rad_col] = weather_df[rad_col].where(
-                ~invalid_rad_mask, np.nan
-            )
+                invalid_count = invalid_rad_mask.sum()
+                if invalid_count > 0:
+                    percent_invalid = (invalid_count / len(weather_df)) * 100
+                    warnings.append(
+                        f"Invalid values in {rad_col}: {invalid_count} records "
+                        f"({percent_invalid:.2f}%) replaced with NaN."
+                    )
+                    logger.warning(warnings[-1])
+                weather_df[rad_col] = weather_df[rad_col].where(
+                    ~invalid_rad_mask, np.nan
+                )
 
     # Metric: Total invalid values
     invalid_rows = weather_df[weather_df.isna().any(axis=1)]
