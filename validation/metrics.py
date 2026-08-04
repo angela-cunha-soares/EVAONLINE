@@ -3,7 +3,7 @@
 All functions take ``sim`` (estimated/simulated) and ``obs`` (reference /
 observed) as 1-D array-likes of equal length, drop pairwise NaNs, and return
 a scalar ``float``. They are deliberately dependency-light (NumPy only) so the
-same definitions back every reviewer-response script and can be unit-tested
+same definitions back every validation script and can be unit-tested
 against textbook values.
 
 Definitions follow:

@@ -442,7 +442,7 @@ docs/drafts/
 # Validation Dataset (published on Zenodo)
 # ===========================================
 # Full dataset available at: https://doi.org/10.5281/zenodo.17791398
-EVAonline_validation_v1.0.0/
+EVAonline_validation/
 
 # ===========================================
 # Project Specific Files (KEPT)

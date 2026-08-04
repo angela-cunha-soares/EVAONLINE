@@ -1,4 +1,4 @@
-"""Vectorised EVAonline pipeline for reviewer-response experiments.
+"""Vectorised EVAonline pipeline for validation experiments.
 
 Self-contained re-implementation of the two-stage pipeline used in production
 (``backend/core/data_processing``), kept here so the validation experiments are
@@ -10,7 +10,7 @@ reproducible without a running backend:
 
 The numerics mirror ``sensitivity_weights.py`` / ``sensitivity_kalman_params.py``
 from the validation dataset (same constants), but with configurable knobs so the
-ablation (R1-C7) and cross-validation (R1-C1) scripts can toggle components.
+the ablation and cross-validation scripts can toggle components.
 """
 
 from __future__ import annotations
@@ -167,7 +167,7 @@ def apply_kalman_eto(eto_raw, dates, ref, kalman_kwargs, *, use_priors=True,
                      use_bias=True, use_bounds=True):
     """3-step ET0 Kalman (bias -> correction -> continuous filter).
 
-    Component switches (for the R1-C7 ablation, isolating one effect each):
+    Component switches (for the ablation, isolating one effect each):
       use_priors : master switch. False => simplified mode (no climatological
                    anchoring at all: no bias correction, no p01/p99 bounds).
       use_bias   : apply the monthly climatological bias correction.

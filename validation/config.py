@@ -1,7 +1,7 @@
-"""Shared paths and constants for the reviewer-response scripts.
+"""Shared paths and constants for the validation scripts.
 
 The heavy validation dataset (cached daily ET0, Xavier reference, sensitivity
-CSVs) lives in the ``EVAonline_validation_v1.0.0`` package, which is *not*
+CSVs) lives in the ``EVAonline_validation`` package, which is *not*
 tracked by git. These scripts read from it and write reproducible artefacts
 into ``validation/outputs/`` (tracked).
 """
@@ -15,11 +15,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Validation data package. Override with EVAONLINE_VALIDATION_DIR if it lives
-# elsewhere (e.g., the copy under "REFERÊNCIAS - TESE e ARTIGOS/EVAONLINE/").
+# elsewhere.
 DATA_PKG = Path(
     os.environ.get(
         "EVAONLINE_VALIDATION_DIR",
-        REPO_ROOT / "EVAonline_validation_v1.0.0",
+        REPO_ROOT / "EVAonline_validation",
     )
 )
 
@@ -37,7 +37,7 @@ OUTPUTS = REPO_ROOT / "validation" / "outputs"
 # ---- Canonical study-design constants (single source of truth) -------------
 N_SITES = 17
 N_DAYS_PER_SITE = 10_958          # 1991-01-01 .. 2020-12-31 (30 yr)
-N_OBS = N_SITES * N_DAYS_PER_SITE  # 186_286  -> resolves Reviewer 1, comment 8
+N_OBS = N_SITES * N_DAYS_PER_SITE  # 186_286 total daily observations
 
 CALIB_YEARS = (1991, 2010)        # temporal-split training window
 VALID_YEARS = (2011, 2020)        # temporal-split held-out window
@@ -49,7 +49,7 @@ def require_data() -> None:
         raise SystemExit(
             "Validation data not found.\n"
             f"  expected: {CACHE_DIR}\n"
-            "  set EVAONLINE_VALIDATION_DIR to the EVAonline_validation_v1.0.0 path."
+            "  set EVAONLINE_VALIDATION_DIR to the EVAonline_validation path."
         )
 
 

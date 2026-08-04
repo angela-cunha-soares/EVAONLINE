@@ -1,12 +1,12 @@
-"""Reviewer 1, comment 6: regenerate Figure 4 with R2/KGE/NSE annotations.
+"""Error boxplots figure with R2/KGE/NSE annotations.
 
 Daily ET0 error (estimated - reference) boxplots for the four sources, each box
-annotated with the *site-wise median* R2, KGE and NSE (Reviewer 1 asked for the
+annotated with the *site-wise median* R2, KGE and NSE (we report the
 same key metrics shown elsewhere). Site-wise metrics are read from the
 per-city comparison table; daily errors are pooled across the 17 sites.
 
-Outputs: r1c6_fig04_error_boxplots.pdf / .png
-Run:     python -m validation.r1c6_figure4
+Outputs: error_boxplots.pdf / .png
+Run:     python -m validation.figure_error_boxplots
 """
 
 from __future__ import annotations
@@ -121,7 +121,7 @@ def main() -> None:
 
     fig.tight_layout()
     for ext in ("pdf", "png"):
-        fig.savefig(out / f"r1c6_fig04_error_boxplots.{ext}", dpi=200,
+        fig.savefig(out / f"error_boxplots.{ext}", dpi=200,
                     bbox_inches="tight")
     plt.close(fig)
     print(f"\nFigure written to {out}")

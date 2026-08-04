@@ -5,7 +5,7 @@
 
 EVAonline is a comprehensive web platform for estimating reference evapotranspiration (ET₀) using the **FAO-56 Penman-Monteith** method. It integrates real-time meteorological data from multiple global sources through a **two-stage data fusion** approach—region‑adaptive weighted averaging followed by Kalman smoothing—to deliver accurate, bias‑corrected daily ET₀. Built with Dash + FastAPI, it provides interactive dashboards, WebSocket progress tracking, water‑deficit analysis, and full bilingual support (EN/PT).
 
-For a detailed description of the methodology and case studies, please refer to our Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17791398.svg)](https://doi.org/10.5281/zenodo.17791398)
+For a detailed description of the methodology and case studies, please refer to our Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17791397.svg)](https://doi.org/10.5281/zenodo.17791397)
 
 ---
 
@@ -234,16 +234,66 @@ Key configuration options in `.env`:
 
 The complete validation dataset and reproducibility package are available on **Zenodo**:
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17791398.svg)](https://doi.org/10.5281/zenodo.17791398)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17791397.svg)](https://doi.org/10.5281/zenodo.17791397)
 
-**EVAonline Validation Dataset: Kalman Fusion System for Reference Evapotranspiration in Brazil (1991–2020)**
+**EVAonline: An open-source web platform for global reference evapotranspiration estimation via multi-source data fusion** — Validation Dataset
+*Latest version: **v1.0.2**, published **3 August 2026**. Version DOI: [10.5281/zenodo.21781466](https://doi.org/10.5281/zenodo.21781466) · Concept DOI (all versions): [10.5281/zenodo.17791397](https://doi.org/10.5281/zenodo.17791397).*
 
-This independent validation package contains 186,287 daily observations from 17 Brazilian cities (16 in the MATOPIBA region + Piracicaba/SP) spanning the 1991–2020 climate normal period. It includes:
+This independent validation package contains 186,286 daily observations from 17 Brazilian cities (16 in the MATOPIBA region + Piracicaba/SP) spanning the 1991–2020 climate normal period. It includes:
 
 - **Reference data:** BR‑DWGD (Xavier et al., 0.1° resolution, 3,625+ stations)
 - **Source comparisons:** NASA POWER, Open‑Meteo Archive, and EVAonline two‑stage fusion
 - **Validation scripts** and statistical analyses
 - **Reproducible Jupyter notebooks** for full pipeline replication
+
+---
+
+## 📚 References
+
+### Cite this work
+
+If you use EVAonline, please cite the article and the dataset:
+
+> Soares, A.S.M.C., Ribeiro, V.P., Duarte, S.N., Balestieri, J.A.P., Padovani, C.R., Bordignon, Á.J.Z., Maciel, C.D., & Marques, P.A.A. (2026). EVAonline: An open-source web platform for global reference evapotranspiration estimation via multi-source data fusion. *Environmental Modelling & Software*, 204, 107113. https://doi.org/10.1016/j.envsoft.2026.107113
+
+> Soares, A.S.M.C., Ribeiro, V.P., Duarte, S.N., Balestieri, J.A.P., Padovani, C.R., Bordignon, Á.J.Z., Maciel, C.D., & Marques, P.A.A. (2026). *EVAonline: An open-source web platform for global reference evapotranspiration estimation via multi-source data fusion* (Version 1.0.2) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.17791397
+
+*The DOI `10.5281/zenodo.17791397` is the concept DOI and always resolves to the latest version; the current release is v1.0.2 (`10.5281/zenodo.21781466`).*
+
+### Data sources
+
+Data-source citations follow each provider's official referencing/licensing page.
+
+- **Xavier BR‑DWGD** (reference): Xavier, A.C., Scanlon, B.R., King, C.W., & Alves, A.I. (2022). New improved Brazilian daily weather gridded data (1961–2020). *International Journal of Climatology*, 42(16), 8390–8404. https://doi.org/10.1002/joc.7731
+- **NASA POWER** (MERRA‑2 + CERES): NASA Langley Research Center POWER Project, Daily API (data version v10.2.1), accessed 2025/11/20. https://power.larc.nasa.gov/ — Underlying reanalysis: Gelaro, R., et al. (2017). The Modern‑Era Retrospective Analysis for Research and Applications, Version 2 (MERRA‑2). *Journal of Climate*, 30(14), 5419–5454. https://doi.org/10.1175/JCLI-D-16-0758.1
+- **Open‑Meteo** (ERA5‑Land): Zippenfenig, P. (2023). Open‑Meteo.com Weather API. Zenodo. https://doi.org/10.5281/zenodo.7970649 (CC BY 4.0) — Underlying reanalysis: Muñoz‑Sabater, J., et al. (2021). ERA5‑Land: a state‑of‑the‑art global reanalysis dataset for land applications. *Earth System Science Data*, 13(9), 4349–4383. https://doi.org/10.5194/essd-13-4349-2021; Hersbach, H., et al. (2020). The ERA5 global reanalysis. *QJRMS*, 146(730), 1999–2049. https://doi.org/10.1002/qj.3803
+- **MET Norway**: Locationforecast API. https://api.met.no/ — Licensed under NLOD and CC BY 4.0 ("Based on data from MET Norway").
+- **NWS / NOAA**: National Weather Service API. https://www.weather.gov/documentation/services-web-api — Public domain (U.S. Government work).
+- **Elevation**: Open Topo Data API (Nisbet, 2019, https://www.opentopodata.org/) over SRTM (Farr, T.G., et al., 2007. *Reviews of Geophysics*, 45, RG2004. https://doi.org/10.1029/2005RG000183) and ASTER GDEM v3 (NASA/METI, 2019. https://doi.org/10.5067/ASTER/ASTGTM.003).
+
+### Data attribution required by providers
+
+Following each source's official referencing/licensing page:
+
+- **NASA POWER** ([referencing guide](https://power.larc.nasa.gov/docs/referencing/)) — include **both** references:
+  - **POWER's Reference:** "The data was obtained from National Aeronautics and Space Administration (NASA) Langley Research Center's Prediction Of Worldwide Energy Resources (POWER) project funded through the NASA Earth Science Division."
+  - **POWER's Data Reference:** "The data was obtained from the POWER Project's Daily API (data version v10.2.1) on 2025/11/20."
+  - Data under CC BY 4.0.
+- **Open‑Meteo** ([licence](https://open-meteo.com/en/licence)): cite the API software as Zippenfenig (2023), doi:10.5281/zenodo.7970649 (CC BY 4.0); underlying data from Copernicus C3S ERA5‑Land (CC BY 4.0).
+- **MET Norway** ([licensing](https://www.met.no/en/free-meteorological-data/Licensing-and-crediting)): licensed under NLOD and CC BY 4.0; credit "Based on data from MET Norway".
+- **NWS / NOAA** ([disclaimer](https://www.weather.gov/disclaimer)): information produced by the U.S. National Weather Service is in the public domain (U.S. Government work).
+- **Elevation:** point queries served by the Open Topo Data API (Nisbet, 2019) over the SRTM (Farr et al., 2007) and ASTER GDEM v3 (NASA/METI, 2019) digital elevation models (~30 m).
+- **Xavier BR‑DWGD:** Brazilian daily weather gridded product; cite Xavier et al. (2022).
+
+### Methods & metrics
+
+- Allen, R.G., Pereira, L.S., Raes, D., & Smith, M. (1998). Crop evapotranspiration — Guidelines for computing crop water requirements. *FAO Irrigation and Drainage Paper 56*. FAO, Rome.
+- Kalman, R.E. (1960). A new approach to linear filtering and prediction problems. *Journal of Basic Engineering*, 82(1), 35–45. https://doi.org/10.1115/1.3662552
+- Gupta, H.V., Kling, H., Yilmaz, K.K., & Martinez, G.F. (2009). Decomposition of the mean squared error and NSE performance criteria. *Journal of Hydrology*, 377(1–2), 80–91. https://doi.org/10.1016/j.jhydrol.2009.08.003
+- Nash, J.E., & Sutcliffe, J.V. (1970). River flow forecasting through conceptual models part I. *Journal of Hydrology*, 10(3), 282–290. https://doi.org/10.1016/0022-1694(70)90255-6
+- Moriasi, D.N., et al. (2007). Model evaluation guidelines for systematic quantification of accuracy in watershed simulations. *Transactions of the ASABE*, 50(3), 885–900. https://doi.org/10.13031/2013.23153
+
+> Full BibTeX entries are available in [`EVAonline_validation/references.bib`](EVAonline_validation/references.bib).
 
 ---
 

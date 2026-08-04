@@ -1,8 +1,8 @@
-"""Reviewer 1, comment 2: full per-site validation table (Supplementary).
+"""Full per-site validation table (Supplementary).
 
-Generates the complete 17-site breakdown (EVAonline Fusion) so reviewers can
+Generates the complete 17-site breakdown (EVAonline Fusion) so readers can
 inspect site-level skill directly, sorted by KGE. Writes a ready-to-paste
-LaTeX body to outputs/r1c2_persite_table.tex.
+LaTeX body to outputs/persite_table.tex.
 """
 
 from __future__ import annotations
@@ -55,9 +55,9 @@ def main() -> None:
         f"[{d.pbias.min():+.2f}, {d.pbias.max():+.2f}] \\\\"
     )
     body = "\n".join(lines)
-    (out / "r1c2_persite_table.tex").write_text(body + "\n", encoding="utf-8")
+    (out / "persite_table.tex").write_text(body + "\n", encoding="utf-8")
     print(body)
-    print(f"\nWritten to {out / 'r1c2_persite_table.tex'}")
+    print(f"\nWritten to {out / 'persite_table.tex'}")
 
 
 if __name__ == "__main__":
