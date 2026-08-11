@@ -127,12 +127,17 @@ class TestCheckCalculationLimit:
         assert allowed is False
 
     @patch("backend.api.middleware.rate_limiter._get_redis")
-    def test_redis_error_fails_open(self, mock_get_redis):
-        """If Redis fails, allow the request (fail open)"""
+    def test_redis_error_fails_closed(self, mock_get_redis):
+        """If Redis fails, DENY the request (fail closed).
+
+        Redis is also the Celery broker, so if it is down calculations
+        cannot be dispatched anyway — denying is the safe choice and
+        prevents the rate limit from silently disappearing.
+        """
         mock_get_redis.side_effect = Exception("Redis down")
         allowed, msg = check_calculation_limit("192.168.1.1")
-        assert allowed is True
-        assert msg is None
+        assert allowed is False
+        assert msg is not None
 
 
 # ════════════════════════════════════════════════════════════════════
