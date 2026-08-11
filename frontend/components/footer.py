@@ -330,22 +330,6 @@ def create_footer(lang: str = "en") -> html.Footer:
                                                 ),
                                                 html.A(
                                                     [
-                                                        html.I(
-                                                            className="bi bi-code-slash footer-icon",
-                                                        ),
-                                                        html.Span(
-                                                            "API",
-                                                            className="d-block small mt-1 footer-icon-label",
-                                                        ),
-                                                    ],
-                                                    href="/api/v1/docs",
-                                                    target="_blank",
-                                                    rel="noopener noreferrer",
-                                                    title="Documentação da API",
-                                                    className="footer-icon-link",
-                                                ),
-                                                html.A(
-                                                    [
                                                         html.Img(
                                                             src="/assets/images/zenodo.svg",
                                                             alt="Zenodo",
