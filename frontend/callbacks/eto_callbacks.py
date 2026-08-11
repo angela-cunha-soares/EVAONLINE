@@ -705,9 +705,10 @@ def update_source_description(data_type):
 )
 def enable_calculate_button(coords_data, data_type):
     """
-    Habilita o botão Calculate ETO apenas quando:
-    1. Coordenadas estão selecionadas (clicou no mapa)
-    2. Data Type está selecionado (historical, recent ou forecast)
+    Habilita o botão Calculate ETO quando há coordenadas + tipo de dados.
+
+    A verificação de e-mail do histórico é feita no servidor ao enviar
+    (retorna 'verification_required'); não é mais um gate do botão.
     """
     has_coords = (
         coords_data is not None
@@ -719,10 +720,195 @@ def enable_calculate_button(coords_data, data_type):
         "recent",
         "forecast",
     ]
-
-    # Retorna True (disabled) se qualquer condição não for atendida
-    # Retorna False (enabled) se ambas condições forem atendidas
     return not (has_coords and has_data_type)
+
+
+@callback(
+    Output("calculate-eto-btn", "children", allow_duplicate=True),
+    Input("data-type-radio", "value"),
+    State("language-store", "data"),
+    prevent_initial_call=True,
+)
+def update_calculate_button_label(data_type, lang):
+    """
+    Histórico → botão "Confirmar" (dispara a confirmação por e-mail).
+    Demais modos → "Calcular ETo".
+    """
+    lang = lang or "en"
+    is_pt = lang == "pt"
+    if data_type == "historical":
+        return [
+            html.I(className="bi bi-envelope-check me-2"),
+            "CONFIRMAR" if is_pt else "CONFIRM",
+        ]
+    return [
+        html.I(className="bi bi-calculator-fill me-2"),
+        t(lang, "sidebar", "calculate_btn", default="CALCULATE ETo"),
+    ]
+
+
+# ============================================================================
+# PAINEL "COMO FUNCIONA" (modo Histórico) — preenche o espaço à direita
+# ============================================================================
+def _hist_step(icon, title, desc, last=False):
+    """Um passo do guia do modo histórico."""
+    connector = (
+        None
+        if last
+        else html.Div(
+            style={
+                "width": "2px",
+                "flex": "1",
+                "backgroundColor": "#dee2e6",
+                "margin": "4px 0",
+            }
+        )
+    )
+    return html.Div(
+        [
+            html.Div(
+                [
+                    html.Div(
+                        html.I(className=f"bi {icon}"),
+                        style={
+                            "width": "34px",
+                            "height": "34px",
+                            "borderRadius": "50%",
+                            "backgroundColor": "#E1F5EE",
+                            "color": "#0F6E56",
+                            "display": "flex",
+                            "alignItems": "center",
+                            "justifyContent": "center",
+                            "flexShrink": "0",
+                        },
+                    ),
+                    connector,
+                ],
+                style={
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "alignItems": "center",
+                },
+            ),
+            html.Div(
+                [
+                    html.Div(title, className="fw-semibold"),
+                    html.Div(
+                        desc,
+                        className="text-muted small",
+                        style={"lineHeight": "1.5"},
+                    ),
+                ],
+                className="pb-3" if not last else "",
+            ),
+        ],
+        className="d-flex",
+        style={"gap": "12px"},
+    )
+
+
+def _hist_chip(icon, text):
+    return html.Span(
+        [html.I(className=f"bi {icon} me-1"), text],
+        className="hist-info-chip",
+    )
+
+
+@callback(
+    Output("historical-info-panel", "children"),
+    Input("data-type-radio", "value"),
+    State("language-store", "data"),
+)
+def render_historical_info_panel(data_type, lang):
+    """Mostra o guia 'Como funciona' apenas no modo Histórico."""
+    if data_type != "historical":
+        return None
+    lang = lang or "en"
+    is_pt = lang == "pt"
+
+    steps = [
+        _hist_step(
+            "bi-envelope-check",
+            "1. Confirme seu e-mail" if is_pt else "1. Confirm your email",
+            (
+                "Clique no link que enviamos (vale 30 dias). Verifique o spam."
+                if is_pt
+                else "Click the link we send (valid 30 days). Check your spam."
+            ),
+        ),
+        _hist_step(
+            "bi-hourglass-split",
+            "2. Processamento na fila" if is_pt else "2. Processing queue",
+            (
+                "Leva de 1 a 5 min. Você recebe um e-mail avisando o início."
+                if is_pt
+                else "Takes 1-5 min. You get an email when it starts."
+            ),
+        ),
+        _hist_step(
+            "bi-download",
+            "3. Baixe os resultados" if is_pt else "3. Download the results",
+            (
+                "Link de download no e-mail, válido por 48 horas."
+                if is_pt
+                else "Download link in the email, valid for 48 hours."
+            ),
+            last=True,
+        ),
+    ]
+
+    chips = html.Div(
+        [
+            _hist_chip(
+                "bi-calendar3",
+                "Até 90 dias por requisição"
+                if is_pt
+                else "Up to 90 days per request",
+            ),
+            _hist_chip(
+                "bi-envelope",
+                "10 solicitações/dia" if is_pt else "10 requests/day",
+            ),
+            _hist_chip("bi-broadcast", "NASA POWER + Open-Meteo"),
+        ],
+        className="d-flex flex-wrap mt-3 pt-3 hist-chips-row",
+    )
+
+    return dbc.Card(
+        dbc.CardBody(
+            [
+                html.Div(
+                    [
+                        html.I(
+                            className="bi bi-signpost-2 me-2",
+                            style={"color": "#1D9E75", "fontSize": "1.2rem"},
+                        ),
+                        html.Span(
+                            "Como funciona o modo histórico"
+                            if is_pt
+                            else "How historical mode works",
+                            className="fw-semibold",
+                            style={"fontSize": "1.05rem"},
+                        ),
+                    ],
+                    className="d-flex align-items-center mb-1",
+                ),
+                html.P(
+                    (
+                        "Depois de clicar em Confirmar, o processo segue por "
+                        "e-mail em 3 etapas:"
+                        if is_pt
+                        else "After clicking Confirm, the process continues "
+                        "by email in 3 steps:"
+                    ),
+                    className="text-muted small mb-3",
+                ),
+                html.Div(steps),
+                chips,
+            ]
+        ),
+        className="historical-info-card shadow-sm",
+    )
 
 
 # ============================================================================
@@ -806,69 +992,23 @@ def reset_for_new_query(n_clicks_main, n_clicks_sidebar, lang):
 )
 def render_conditional_form(data_type, lang):
     """
-    Renderiza formulário condicional baseado no tipo de dados.
+    Renderiza o formulário condicional conforme o tipo de dados.
 
-    - Histórico: date range (1990 → ontem)
-    - Atual: últimos N dias (1-7)
+    - Histórico: e-mail + datas + formato juntos (a verificação de e-mail é
+      feita no servidor ao enviar).
+    - Recente/Previsão: seleção de período.
     """
     if not lang:
         lang = "en"
+    is_pt = lang == "pt"
 
     if data_type == "historical":
         # Date format depends on language
         date_format = "MM/DD/YYYY" if lang == "en" else "DD/MM/YYYY"
- 
+
         return html.Div(
             [
-                html.Label(
-                    t(lang, "form", "analysis_period", default="Analysis Period:"),
-                    className="fw-bold mb-3",
-                    style={"fontSize": "1.1rem"},
-                ),
-                # Data Inicial
-                html.Div(
-                    [
-                        html.Label(
-                            t(lang, "form", "start_date_label", default="Start Date (MM/DD/YYYY):"),
-                            className="mb-2",
-                        ),
-                        dcc.DatePickerSingle(
-                            id="start-date-historical",
-                            min_date_allowed=datetime(1990, 1, 1),
-                            max_date_allowed=datetime.now()
-                            - timedelta(days=1),
-                            initial_visible_month=datetime.now()
-                            - timedelta(days=30),
-                            date=None,
-                            display_format=date_format,
-                            placeholder=t(lang, "form", "date_placeholder", default="MM/DD/YYYY"),
-                            className="w-100",
-                        ),
-                    ],
-                    className="mb-3",
-                ),
-                # Data Final
-                html.Div(
-                    [
-                        html.Label(
-                            t(lang, "form", "end_date_label", default="End Date (MM/DD/YYYY):"),
-                            className="mb-2",
-                        ),
-                        dcc.DatePickerSingle(
-                            id="end-date-historical",
-                            min_date_allowed=datetime(1990, 1, 1),
-                            max_date_allowed=datetime.now()
-                            - timedelta(days=1),
-                            initial_visible_month=datetime.now(),
-                            date=None,
-                            display_format=date_format,
-                            placeholder=t(lang, "form", "date_placeholder", default="MM/DD/YYYY"),
-                            className="w-100",
-                        ),
-                    ],
-                    className="mb-3",
-                ),
-                # MANDATORY Email field for historical data
+                # E-mail (obrigatório) — usado para validar e entregar os dados
                 html.Div(
                     [
                         html.Label(
@@ -891,13 +1031,61 @@ def render_conditional_form(data_type, lang):
                             type="invalid",
                         ),
                         html.Small(
-                            t(lang, "form", "email_required", default="Required for report delivery"),
+                            (
+                                "Você receberá um link para confirmar o e-mail "
+                                "antes do processamento."
+                                if is_pt
+                                else "You'll get a link to confirm your email "
+                                "before processing."
+                            ),
                             className="text-info d-block mt-1",
                         ),
                     ],
                     className="mb-3",
                 ),
-                # File format selection
+                html.Label(
+                    t(lang, "form", "analysis_period", default="Analysis Period:"),
+                    className="fw-bold mb-3",
+                    style={"fontSize": "1.1rem"},
+                ),
+                html.Div(
+                    [
+                        html.Label(
+                            t(lang, "form", "start_date_label", default="Start Date (MM/DD/YYYY):"),
+                            className="mb-2",
+                        ),
+                        dcc.DatePickerSingle(
+                            id="start-date-historical",
+                            min_date_allowed=datetime(1990, 1, 1),
+                            max_date_allowed=datetime.now() - timedelta(days=1),
+                            initial_visible_month=datetime.now() - timedelta(days=30),
+                            date=None,
+                            display_format=date_format,
+                            placeholder=t(lang, "form", "date_placeholder", default="MM/DD/YYYY"),
+                            className="w-100",
+                        ),
+                    ],
+                    className="mb-3",
+                ),
+                html.Div(
+                    [
+                        html.Label(
+                            t(lang, "form", "end_date_label", default="End Date (MM/DD/YYYY):"),
+                            className="mb-2",
+                        ),
+                        dcc.DatePickerSingle(
+                            id="end-date-historical",
+                            min_date_allowed=datetime(1990, 1, 1),
+                            max_date_allowed=datetime.now() - timedelta(days=1),
+                            initial_visible_month=datetime.now(),
+                            date=None,
+                            display_format=date_format,
+                            placeholder=t(lang, "form", "date_placeholder", default="MM/DD/YYYY"),
+                            className="w-100",
+                        ),
+                    ],
+                    className="mb-3",
+                ),
                 html.Div(
                     [
                         html.Label(
@@ -907,14 +1095,8 @@ def render_conditional_form(data_type, lang):
                         dbc.RadioItems(
                             id="file-format-historical",
                             options=[
-                                {
-                                    "label": " Excel (.xlsx)",
-                                    "value": "excel",
-                                },
-                                {
-                                    "label": " CSV (.csv)",
-                                    "value": "csv",
-                                },
+                                {"label": " Excel (.xlsx)", "value": "excel"},
+                                {"label": " CSV (.csv)", "value": "csv"},
                             ],
                             value=None,
                             inline=False,
@@ -1598,10 +1780,41 @@ def calculate_eto(
 
         logger.info(f"📦 Final payload (auto-fusion): {payload}")
 
-        # Make POST request
+        # Repassar o IP REAL do usuário para o backend.
+        # O callback roda no servidor; sem isso o backend veria 127.0.0.1
+        # para todos os usuários (quebrando o rate-limit por IP).
+        real_ip = "unknown"
+        try:
+            from flask import request as flask_request
+
+            xff = flask_request.headers.get("X-Forwarded-For", "")
+            real_ip = (
+                xff.split(",")[0].strip()
+                or flask_request.headers.get("X-Real-IP", "")
+                or flask_request.remote_addr
+                or "unknown"
+            )
+        except Exception as ip_err:  # pragma: no cover - defensivo
+            logger.warning(f"Não foi possível obter o IP real: {ip_err}")
+
+        # Shared internal token (defense-in-depth for the internal endpoint)
+        internal_token = ""
+        try:
+            from backend.api.security.internal_auth import get_internal_token
+
+            internal_token = get_internal_token()
+        except Exception as tok_err:  # pragma: no cover - defensivo
+            logger.warning(f"Não foi possível obter o token interno: {tok_err}")
+
+        # Make POST request (forwarding the real client IP + internal token)
         response = requests.post(
             "http://localhost:8000/api/v1/internal/eto/calculate",
             json=payload,
+            headers={
+                "X-Forwarded-For": real_ip,
+                "X-Real-IP": real_ip,
+                "X-Internal-Token": internal_token,
+            },
             timeout=30,
         )
 
@@ -1647,6 +1860,37 @@ def calculate_eto(
                     backend_mode,  # Salvar o modo de operação
                     immediate_spinner,  # Spinner imediato
                 )
+
+            # Verificação de e-mail necessária (modo histórico)
+            if task_response.get("status") == "verification_required":
+                logger.info("📧 Verificação de e-mail necessária")
+                verify_msg = {
+                    "en": (
+                        "We sent a confirmation link to your email. Click it "
+                        "to verify your address, then submit again. "
+                        "If you don't see it, please check your spam/junk "
+                        "folder."
+                    ),
+                    "pt": (
+                        "Enviamos um link de confirmação para o seu e-mail. "
+                        "Clique nele para verificar o endereço e depois envie "
+                        "novamente. Se não encontrar, verifique também a "
+                        "caixa de spam/lixo eletrônico."
+                    ),
+                }.get(lang, task_response.get("message", ""))
+                info_alert = dbc.Alert(
+                    [
+                        html.I(className="bi bi-envelope-check me-2"),
+                        html.Strong(
+                            "Check your email: "
+                            if lang == "en"
+                            else "Verifique seu e-mail: "
+                        ),
+                        verify_msg,
+                    ],
+                    color="info",
+                )
+                return None, mode_indicator, info_alert, None, True, None, None
 
             # Se não foi aceito
             error_alert = dbc.Alert(
@@ -2157,7 +2401,7 @@ def update_progress(n_intervals, task_id, operation_mode, lang=None):
                                                 style={"color": "#006699"},
                                             ),
                                             html.Small(
-                                                t(lang, "results", "check_inbox", default="Check your inbox and spam folder. The file is attached in the requested format."),
+                                                t(lang, "results", "check_inbox", default="Check your inbox and spam folder. Download your file using the link in the email (valid for 48 hours)."),
                                                 className="text-muted",
                                             ),
                                         ],

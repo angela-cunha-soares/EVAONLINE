@@ -171,6 +171,8 @@ def increment_visitor_on_session_start(session_id, already_incremented):
         Output("footer-developers-title", "children"),
         Output("footer-partners-title", "children"),
         Output("footer-links-title", "children"),
+        Output("footer-cite-title", "children"),
+        Output("footer-cite-intro", "children"),
     ],
     Input("language-store", "data"),
 )
@@ -189,6 +191,13 @@ def translate_visitor_labels(lang):
     developers_text = t(lang, "footer", "developers", default="Developers")
     partners_text = t(lang, "footer", "partners", default="Partners")
     links_text = t(lang, "footer", "links", default="Important Links")
+    cite_title_text = t(lang, "footer", "cite_title", default="How to Cite")
+    cite_intro_text = t(
+        lang,
+        "footer",
+        "cite_intro",
+        default="If you use EVAonline in your research, please cite:",
+    )
 
     return (
         f"{visitors_text}: ",
@@ -199,6 +208,8 @@ def translate_visitor_labels(lang):
         developers_text,
         partners_text,
         links_text,
+        cite_title_text,
+        cite_intro_text,
     )
 
 
