@@ -77,12 +77,18 @@ _validate_production_secrets()
 
 
 def create_application() -> FastAPI:
+    # Expose the interactive API schema (Swagger/ReDoc/OpenAPI) only outside
+    # production. In production it would leak the internal endpoint surface
+    # (e.g. /internal/eto/*), so we disable it there.
+    _is_production = os.getenv("ENVIRONMENT", "development").lower() == "production"
     app = FastAPI(
         title="EVAonline",
         version="1.0.0",
-        openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
-        docs_url=f"{settings.API_V1_PREFIX}/docs",
-        redoc_url=f"{settings.API_V1_PREFIX}/redoc",
+        openapi_url=(
+            None if _is_production else f"{settings.API_V1_PREFIX}/openapi.json"
+        ),
+        docs_url=(None if _is_production else f"{settings.API_V1_PREFIX}/docs"),
+        redoc_url=(None if _is_production else f"{settings.API_V1_PREFIX}/redoc"),
     )
 
     # Configure CORS

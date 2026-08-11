@@ -51,6 +51,49 @@ broker_url = os.getenv("CELERY_BROKER_URL") or get_celery_broker_url()
 result_backend = (
     os.getenv("CELERY_RESULT_BACKEND") or get_celery_result_backend()
 )
+
+
+def _inject_redis_auth(url: str) -> str:
+    """
+    Se o Redis exige senha mas a URL do broker/backend veio sem auth
+    (ex.: CELERY_BROKER_URL=redis://redis:6379/0 no .env), usa EXATAMENTE a
+    mesma URL autenticada que o resto do app usa (settings.redis.redis_url) —
+    forma `redis://:senha@host` (usuário vazio), que comprovadamente autentica
+    (é a que o rate-limiter usa). Evita o 'NOAUTH Authentication required'.
+
+    Preserva o número do DB da URL original, se houver.
+    """
+    try:
+        from config.settings.app_config import get_settings
+
+        redis_cfg = get_settings().redis
+    except Exception:
+        return url
+
+    if not redis_cfg.PASSWORD:
+        return url
+    if not url or "@" in url or not url.startswith("redis://"):
+        return url
+
+    # Preserva o DB (ex.: .../0) da URL original.
+    db = url.rstrip("/").rsplit("/", 1)
+    db_suffix = f"/{db[1]}" if len(db) == 2 and db[1].isdigit() else "/0"
+    return (
+        f"redis://:{redis_cfg.PASSWORD}@"
+        f"{redis_cfg.HOST}:{redis_cfg.PORT}{db_suffix}"
+    )
+
+
+broker_url = _inject_redis_auth(broker_url)
+result_backend = _inject_redis_auth(result_backend)
+
+# CRÍTICO: o Celery lê CELERY_BROKER_URL / CELERY_RESULT_BACKEND do ambiente
+# automaticamente e isso sobrescreve o broker passado no construtor. Como o
+# .env define essas variáveis SEM senha, o broker ficava sem auth (NOAUTH).
+# Sobrescrevemos as env vars com a URL autenticada ANTES de criar o app.
+os.environ["CELERY_BROKER_URL"] = broker_url
+os.environ["CELERY_RESULT_BACKEND"] = result_backend
+
 print(f"🔍 DEBUG Celery - broker_url: {broker_url[:50]}...")
 print(f"🔍 DEBUG Celery - result_backend: {result_backend[:50]}...")
 legacy_settings = get_legacy_settings()
@@ -117,6 +160,10 @@ celery_app.Task = MonitoredProgressTask
 
 # Configurações principais
 celery_app.conf.update(
+    # Broker/backend autenticados (força a URL com senha, evitando que o
+    # CELERY_BROKER_URL sem senha do .env sobrescreva o broker → NOAUTH).
+    broker_url=broker_url,
+    result_backend=result_backend,
     # Serialização
     task_serializer="json",
     accept_content=["json"],
@@ -211,6 +258,11 @@ celery_app.conf.beat_schedule = {
             "backend.infrastructure.cache.celery_tasks.update_popular_ranking"
         ),
         "schedule": crontab(minute="*/10"),  # A cada 10 minutos
+    },
+    # Limpeza de arquivos de download expirados (a cada hora, min 15)
+    "cleanup-expired-downloads": {
+        "task": "storage.cleanup_expired_downloads",
+        "schedule": crontab(minute=15),  # Todo início de hora (min 15)
     },
 }
 

@@ -16,7 +16,7 @@ Limits:
 - Global: 50/day per user across all modes
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from loguru import logger
@@ -41,8 +41,8 @@ def _get_redis() -> Redis:
 
 
 def _get_key(identifier: str, mode: str) -> str:
-    """Build Redis key for rate limiting."""
-    today = datetime.now().strftime("%Y-%m-%d")
+    """Build Redis key for rate limiting (resets at midnight UTC)."""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     return f"calc_limit:{identifier}:{mode}:{today}"
 
 
@@ -93,24 +93,35 @@ def _check_identifier_limit(
     return True, None
 
 
+def _normalize_email(email: str) -> str:
+    """Normalize an email for use as a rate-limit identifier."""
+    return email.strip().lower()
+
+
 def check_calculation_limit(
     client_ip: str,
     mode: str = "dashboard_current",
     visitor_id: Optional[str] = None,
+    email: Optional[str] = None,
 ) -> tuple[bool, Optional[str]]:
     """
     Check if user has remaining calculation quota.
 
-    Uses dual identification: IP + visitor_id.
-    Both are checked; the most restrictive one prevails.
-    This provides:
-    - IP: network-level abuse protection
-    - visitor_id: per-browser granularity (e.g. university lab)
+    Uses layered identification: IP + visitor_id + email.
+    All provided identifiers are checked; the most restrictive prevails.
+    - IP: network-level abuse protection (real client IP, forwarded by the UI)
+    - visitor_id: per-browser granularity (persistent localStorage id)
+    - email: strong identifier for the historical mode (email is required)
+
+    Fails CLOSED: if Redis is unavailable the request is denied. This is safe
+    because Redis is also the Celery broker — if it is down, calculations
+    cannot be dispatched anyway.
 
     Args:
-        client_ip: IP address of the client
+        client_ip: Real IP address of the client
         mode: Operation mode
         visitor_id: Unique browser identifier (from localStorage)
+        email: Requester email (historical mode)
 
     Returns:
         (allowed, error_message) - True if allowed, False with message if blocked
@@ -132,18 +143,31 @@ def check_calculation_limit(
             if not allowed:
                 return False, msg
 
+        # 3. Check email-based limits (strong id for historical mode)
+        if email:
+            email_key = f"email:{_normalize_email(email)}"
+            allowed, msg = _check_identifier_limit(
+                redis, email_key, "email", mode
+            )
+            if not allowed:
+                return False, msg
+
         return True, None
 
     except Exception as e:
-        # If Redis fails, allow the request (fail open)
-        logger.error(f"Rate limiter error: {e}")
-        return True, None
+        # Fail CLOSED: deny when the limiter cannot verify quotas.
+        logger.error(f"Rate limiter error (fail-closed, denying): {e}")
+        return False, (
+            "Rate limiting service is temporarily unavailable. "
+            "Please try again in a few moments."
+        )
 
 
 def track_calculation(
     client_ip: str,
     mode: str = "dashboard_current",
     visitor_id: Optional[str] = None,
+    email: Optional[str] = None,
 ) -> int:
     """
     Increment calculation counter for IP and visitor_id.
@@ -182,6 +206,17 @@ def track_calculation(
             redis.incr(vid_global_key)
             redis.expire(vid_global_key, ttl)
 
+        # Track email (strong id for historical mode)
+        if email:
+            email_key = f"email:{_normalize_email(email)}"
+            email_mode_key = _get_key(email_key, mode)
+            redis.incr(email_mode_key)
+            redis.expire(email_mode_key, ttl)
+
+            email_global_key = _get_key(email_key, "global")
+            redis.incr(email_global_key)
+            redis.expire(email_global_key, ttl)
+
         logger.info(
             f"📊 Calc tracked: IP={client_ip} visitor={visitor_id or 'N/A'} "
             f"mode={mode} global_usage={global_usage}/{CALC_LIMITS['global']}"
@@ -191,6 +226,48 @@ def track_calculation(
 
     except Exception as e:
         logger.error(f"Track calculation error: {e}")
+        return 0
+
+
+def check_global_daily_cap() -> tuple[bool, Optional[str]]:
+    """
+    Site-wide daily calculation cap to protect external API quotas.
+
+    Even if per-user limits are evaded in a distributed way, this caps the
+    total number of calculations the whole platform performs per UTC day.
+    Fails CLOSED (denies) if Redis is unavailable.
+    """
+    try:
+        redis = _get_redis()
+        cap = int(settings.GLOBAL_DAILY_CALC_CAP)
+        key = _get_key("__site__", "global")
+        used_raw = redis.get(key)
+        used = int(used_raw) if used_raw else 0
+        if used >= cap:
+            logger.warning(f"🚫 Global daily cap reached: {used}/{cap}")
+            return False, (
+                "The platform reached its daily calculation capacity. "
+                "Please try again tomorrow."
+            )
+        return True, None
+    except Exception as e:
+        logger.error(f"Global cap check error (fail-closed, denying): {e}")
+        return False, (
+            "Rate limiting service is temporarily unavailable. "
+            "Please try again in a few moments."
+        )
+
+
+def track_global_calculation() -> int:
+    """Increment the site-wide daily calculation counter."""
+    try:
+        redis = _get_redis()
+        key = _get_key("__site__", "global")
+        used = int(redis.incr(key))
+        redis.expire(key, 86400 * 2)
+        return used
+    except Exception as e:
+        logger.error(f"Track global error: {e}")
         return 0
 
 

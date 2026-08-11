@@ -393,14 +393,15 @@ def calculate_eto_task(
 
             try:
                 import pandas as pd
-                from pathlib import Path
                 from backend.core.utils.email_utils import (
-                    send_html_email_with_attachment,
+                    send_html_email,
                     validate_email,
                 )
                 from backend.core.utils.email_templates import (
                     create_data_ready_email,
                 )
+                from backend.infrastructure.storage import result_files
+                from config.settings.app_config import get_settings
 
                 # Validar email fornecido
                 if not validate_email(email):
@@ -439,24 +440,36 @@ def calculate_eto_task(
                         f"{start_date}_{end_date}.{file_ext}"
                     )
 
-                    # Criar diretório temporário se não existir
-                    temp_dir = Path("temp")
-                    temp_dir.mkdir(exist_ok=True)
-                    file_path = temp_dir / filename
-
                     # Converter et0_series para DataFrame
                     et0_series = result.get("et0_series", [])
                     df_result = pd.DataFrame(et0_series)
 
-                    # Salvar no formato escolhido
+                    # Salvar no formato escolhido (em memória)
                     if not df_result.empty:
+                        import io
+
+                        buffer = io.BytesIO()
                         if file_format == "excel":
-                            df_result.to_excel(file_path, index=False)
+                            df_result.to_excel(buffer, index=False)
                         else:
-                            df_result.to_csv(file_path, index=False)
+                            df_result.to_csv(buffer, index=False)
+                        file_bytes = buffer.getvalue()
                         logger.info(
-                            f"📊 Arquivo {file_format.upper()} gerado: "
-                            f"{file_path}"
+                            f"📊 Arquivo {file_format.upper()} gerado em "
+                            f"memória ({len(file_bytes)} bytes)"
+                        )
+
+                        # Guardar arquivo e gerar link de download que expira
+                        settings = get_settings()
+                        token = result_files.save_result(
+                            file_bytes, filename, email
+                        )
+                        base = settings.PUBLIC_BASE_URL.rstrip("/")
+                        download_url = f"{base}/api/v1/download/{token}"
+                        logger.info(
+                            f"🔗 Link de download gerado (expira em "
+                            f"{settings.DOWNLOAD_TTL_HOURS}h): "
+                            f"{download_url}"
                         )
 
                         # Calcular tempo de processamento
@@ -479,7 +492,7 @@ def calculate_eto_task(
                                 "eto_total": sum(eto_values),
                             }
 
-                        # Criar email HTML profissional
+                        # Criar email HTML com o LINK de download (sem anexo)
                         subject, html_body = create_data_ready_email(
                             task_id=task_id,
                             latitude=lat,
@@ -493,27 +506,26 @@ def calculate_eto_task(
                             elevation=result.get("elevation", {}).get("value"),
                             summary_stats=summary_stats,
                             lang=lang,
+                            download_url=download_url,
+                            expiry_hours=settings.DOWNLOAD_TTL_HOURS,
                         )
 
-                        # Enviar email HTML com anexo
-                        email_sent = send_html_email_with_attachment(
+                        # Enviar email HTML com o link (3º e-mail: resultados)
+                        email_sent = send_html_email(
                             to=email,
                             subject=subject,
                             html_body=html_body,
-                            attachment_path=str(file_path),
                         )
 
                         if email_sent:
                             logger.info(
-                                f"✅ Email HTML com anexo enviado para {email}"
+                                f"✅ E-mail de resultados (link) enviado "
+                                f"para {email}"
                             )
                         else:
                             logger.warning(
                                 f"⚠️ Falha ao enviar email para {email}"
                             )
-
-                        # Limpar arquivo temporário após envio bem-sucedido
-                        # (mantém por segurança caso precise reenviar)
                     else:
                         logger.warning("⚠️ Nenhum dado para enviar")
 
