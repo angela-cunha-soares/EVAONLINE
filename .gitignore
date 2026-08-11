@@ -432,6 +432,8 @@ docs/*.tex
 docs/*.bib
 docs/figures/
 docs/restructure_*.py
+# LaTeX result tables that went into the published article
+validation/outputs/*.tex
 
 # ===========================================
 # Archive & Deprecated Docs
