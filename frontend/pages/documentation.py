@@ -180,14 +180,6 @@ def _create_quick_start_section(lang):
                                         ],
                                         className="mb-3 border-start border-primary border-3",
                                     ),
-                                    html.Small(
-                                        _t(
-                                            lang,
-                                            "step3_progress_path",
-                                            default="Current dashboard path: asynchronous task-status updates via Redis polling every 2s (WebSocket endpoint remains available).",
-                                        ),
-                                        className="text-muted d-block mb-3",
-                                    ),
                                     dbc.Alert(
                                         [
                                             html.I(
@@ -362,20 +354,21 @@ def _create_interactive_map_section(lang):
                                                                 [
                                                                     _t(lang, "map_layer_matopiba_desc_start"),
                                                                     html.Strong(
-                                                                        "Ma"
+                                                                        "MA"
                                                                     ),
                                                                     "ranhão, ",
                                                                     html.Strong(
-                                                                        "To"
+                                                                        "TO"
                                                                     ),
                                                                     "cantins, ",
                                                                     html.Strong(
-                                                                        "Pi"
+                                                                        "PI"
                                                                     ),
                                                                     "auí, and " if lang == "en" else "auí e ",
                                                                     html.Strong(
-                                                                        "Ba"
+                                                                        "BA"
                                                                     ),
+                                                                    "hía).",
                                                                     _t(lang, "map_layer_matopiba_desc_end"),
                                                                 ]
                                                             ),
@@ -706,16 +699,6 @@ def _create_operation_modes_section(lang):
                             ),
                         ]
                     ),
-                    # Mode auto-detection note
-                    dbc.Alert(
-                        [
-                            html.I(className="bi bi-info-circle-fill me-2"),
-                            html.Strong(_t(lang, "modes_auto_title")),
-                            _t(lang, "modes_auto_desc"),
-                        ],
-                        color="light",
-                        className="mt-2",
-                    ),
                 ],
                 width=12,
             )
@@ -1019,7 +1002,7 @@ def _create_results_section(lang):
                                                     "tab_summary",
                                                     [f"tab_summary_{i}" for i in range(1, 7)],
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1027,7 +1010,7 @@ def _create_results_section(lang):
                                                     "tab_tables",
                                                     [f"tab_tables_{i}" for i in range(1, 7)],
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1036,7 +1019,7 @@ def _create_results_section(lang):
                                                     [f"tab_charts_{i}" for i in range(1, 7)],
                                                     badge_indices={3},  # heatmap ≥30d
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1045,7 +1028,7 @@ def _create_results_section(lang):
                                                     [f"tab_stats_{i}" for i in range(1, 7)],
                                                     badge_indices={2, 4, 5},  # Shapiro, CV%, skew/kurt
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                         ]
@@ -1180,7 +1163,7 @@ def _create_results_section(lang):
                                                     "chart_eto_temp",
                                                     "chart_eto_temp_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1190,7 +1173,7 @@ def _create_results_section(lang):
                                                     "chart_eto_rad",
                                                     "chart_eto_rad_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1200,7 +1183,7 @@ def _create_results_section(lang):
                                                     "chart_multi",
                                                     "chart_multi_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1211,7 +1194,7 @@ def _create_results_section(lang):
                                                     "chart_heatmap_desc",
                                                     badge="≥30d",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                         ]
@@ -1235,7 +1218,7 @@ def _create_results_section(lang):
                                                     "downloads_per_table_title",
                                                     "downloads_per_table_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1245,7 +1228,7 @@ def _create_results_section(lang):
                                                     "downloads_per_chart_title",
                                                     "downloads_per_chart_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1255,7 +1238,7 @@ def _create_results_section(lang):
                                                     "downloads_global_title",
                                                     "downloads_global_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                             dbc.Col(
@@ -1265,7 +1248,7 @@ def _create_results_section(lang):
                                                     "downloads_email_title",
                                                     "downloads_email_desc",
                                                 ),
-                                                md=3,
+                                                md=6,
                                                 className="mb-2",
                                             ),
                                         ]
@@ -2087,10 +2070,39 @@ def _create_faq_section(lang):
                         id="faq",
                         className="mb-4 doc-section-title",
                     ),
+                    dbc.InputGroup(
+                        [
+                            dbc.InputGroupText(
+                                html.I(className="bi bi-search")
+                            ),
+                            dbc.Input(
+                                id="faq-search",
+                                type="search",
+                                placeholder=_t(
+                                    lang,
+                                    "faq_search_placeholder",
+                                    default="Search the FAQ...",
+                                ),
+                                autoComplete="off",
+                            ),
+                        ],
+                        className="mb-3 doc-faq-search",
+                    ),
                     dbc.Accordion(
                         accordion_items,
                         start_collapsed=True,
-                        className="mb-4",
+                        className="mb-2",
+                        id="faq-accordion",
+                    ),
+                    html.Div(
+                        _t(
+                            lang,
+                            "faq_no_results",
+                            default="No questions match your search.",
+                        ),
+                        id="faq-empty",
+                        className="text-muted small fst-italic mb-4",
+                        style={"display": "none"},
                     ),
                 ],
                 width=12,
@@ -2100,7 +2112,7 @@ def _create_faq_section(lang):
 
 
 def _create_license_section(lang):
-    """Software license."""
+    """Software license — concise summary + link to the full text."""
     return dbc.Row(
         [
             dbc.Col(
@@ -2111,188 +2123,49 @@ def _create_license_section(lang):
                         className="mb-4 doc-section-title",
                     ),
                     dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-                                    html.H5(
-                                        _t(lang, "license_name"),
-                                        className="mb-4",
+                        dbc.CardBody(
+                            [
+                                html.Div(
+                                    [
+                                        html.I(
+                                            className="bi bi-shield-check text-success me-2"
+                                        ),
+                                        html.Strong(_t(lang, "license_name")),
+                                    ],
+                                    className="mb-2",
+                                ),
+                                html.P(
+                                    _t(
+                                        lang,
+                                        "license_summary",
+                                        default=(
+                                            "Free and open-source under the GNU "
+                                            "AGPL-3.0: you may use, modify and "
+                                            "redistribute it (including commercially), "
+                                            "provided you keep the same license, state "
+                                            "your changes and make the source available "
+                                            "\u2014 including when used over a network. "
+                                            "Provided \u201cas is\u201d, without "
+                                            "warranty or liability."
+                                        ),
                                     ),
-                                    # 3 columns: Permissions, Limitations, Conditions
-                                    dbc.Row(
-                                        [
-                                            # Permissions
-                                            dbc.Col(
-                                                [
-                                                    html.H6(
-                                                        _t(lang, "license_permissions"),
-                                                        className="mb-3 text-success",
-                                                    ),
-                                                    html.Div(
-                                                        [
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-check-circle-fill text-success me-2"
-                                                                    ),
-                                                                    _t(lang, "license_perm_commercial"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-check-circle-fill text-success me-2"
-                                                                    ),
-                                                                    _t(lang, "license_perm_modification"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-check-circle-fill text-success me-2"
-                                                                    ),
-                                                                    _t(lang, "license_perm_distribution"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-check-circle-fill text-success me-2"
-                                                                    ),
-                                                                    _t(lang, "license_perm_patent"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-check-circle-fill text-success me-2"
-                                                                    ),
-                                                                    _t(lang, "license_perm_private"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                        ]
-                                                    ),
-                                                ],
-                                                md=4,
-                                                className="mb-3",
-                                            ),
-                                            # Limitations
-                                            dbc.Col(
-                                                [
-                                                    html.H6(
-                                                        _t(lang, "license_limitations"),
-                                                        className="mb-3 text-danger",
-                                                    ),
-                                                    html.Div(
-                                                        [
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-x-circle-fill text-danger me-2"
-                                                                    ),
-                                                                    _t(lang, "license_lim_liability"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-x-circle-fill text-danger me-2"
-                                                                    ),
-                                                                    _t(lang, "license_lim_warranty"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                        ]
-                                                    ),
-                                                ],
-                                                md=4,
-                                                className="mb-3",
-                                            ),
-                                            # Conditions
-                                            dbc.Col(
-                                                [
-                                                    html.H6(
-                                                        _t(lang, "license_conditions"),
-                                                        className="mb-3 text-primary",
-                                                    ),
-                                                    html.Div(
-                                                        [
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-info-circle-fill text-primary me-2"
-                                                                    ),
-                                                                    _t(lang, "license_cond_notice"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-info-circle-fill text-primary me-2"
-                                                                    ),
-                                                                    _t(lang, "license_cond_changes"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-info-circle-fill text-primary me-2"
-                                                                    ),
-                                                                    _t(lang, "license_cond_disclose"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-info-circle-fill text-primary me-2"
-                                                                    ),
-                                                                    _t(lang, "license_cond_network"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                            html.Div(
-                                                                [
-                                                                    html.I(
-                                                                        className="bi bi-info-circle-fill text-primary me-2"
-                                                                    ),
-                                                                    _t(lang, "license_cond_same"),
-                                                                ],
-                                                                className="mb-2",
-                                                            ),
-                                                        ]
-                                                    ),
-                                                ],
-                                                md=4,
-                                                className="mb-3",
-                                            ),
-                                        ]
-                                    ),
-                                    html.Hr(className="my-3"),
-                                    html.P(
-                                        [
-                                            _t(lang, "license_full_text"),
-                                            html.A(
-                                                _t(lang, "license_repo"),
-                                                href="https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE",
-                                                target="_blank",
-                                                className="text-primary",
-                                            ),
-                                            ".",
-                                        ],
-                                        className="text-muted small mb-0",
-                                    ),
-                                ]
-                            )
-                        ],
+                                    className="text-muted mb-3",
+                                ),
+                                html.P(
+                                    [
+                                        _t(lang, "license_full_text"),
+                                        html.A(
+                                            _t(lang, "license_repo"),
+                                            href="https://github.com/angela-cunha-soares/EVAONLINE/blob/main/LICENSE",
+                                            target="_blank",
+                                            className="text-primary",
+                                        ),
+                                        ".",
+                                    ],
+                                    className="text-muted small mb-0",
+                                ),
+                            ]
+                        ),
                         className="mb-4 shadow-sm",
                     ),
                 ],
@@ -2308,196 +2181,92 @@ def _create_license_section(lang):
 
 
 def create_documentation_layout(lang="en"):
-    """Cria o layout da página de documentação com suporte a idioma."""
+    """Layout da documentação: sidebar fixa (scroll-spy) + conteúdo."""
+    nav_items = [
+        ("1", "bi-rocket-takeoff", "nav_quick_start", "#quick-start"),
+        ("2", "bi-map", "nav_map", "#interactive-map"),
+        ("3", "bi-sliders", "nav_modes", "#modos"),
+        ("4", "bi-geo-alt", "nav_usa", "#usa-stations"),
+        ("5", "bi-graph-up", "nav_results", "#resultados"),
+        ("6", "bi-thermometer-half", "nav_variables", "#variables"),
+        ("7", "bi-cloud-download", "nav_sources", "#fontes-dados"),
+        ("8", "bi-lightning", "nav_features", "#funcionalidades"),
+        ("9", "bi-shield-exclamation", "nav_limits", "#usage-limits"),
+        ("10", "bi-question-circle", "nav_faq", "#faq"),
+        ("11", "bi-file-earmark-text", "nav_license", "#licenca"),
+    ]
+
+    nav_links = [
+        html.A(
+            [
+                html.Span(num, className="doc-nav-number"),
+                html.I(className=f"bi {icon} me-2"),
+                html.Span(_t(lang, key), className="doc-nav-text"),
+            ],
+            href=href,
+            className="doc-nav-link",
+        )
+        for num, icon, key, href in nav_items
+    ]
+
+    sidebar = dbc.Col(
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.I(className="bi bi-list-ul me-2"),
+                        _t(lang, "nav_contents", default="Contents"),
+                    ],
+                    className="doc-sidebar-title",
+                ),
+                html.Nav(nav_links, className="doc-sidebar-nav"),
+            ],
+            className="doc-sidebar",
+        ),
+        md=3,
+        className="doc-sidebar-col",
+    )
+
+    content = dbc.Col(
+        html.Div(
+            [
+                _create_quick_start_section(lang),
+                _create_interactive_map_section(lang),
+                _create_operation_modes_section(lang),
+                _create_usa_stations_section(lang),
+                _create_results_section(lang),
+                _create_variables_section(lang),
+                _create_data_sources_section(lang),
+                _create_features_section(lang),
+                _create_usage_limits_section(lang),
+                _create_faq_section(lang),
+                _create_license_section(lang),
+            ],
+            id="doc-content",
+        ),
+        md=9,
+    )
+
+    back_to_top = html.Button(
+        html.I(className="bi bi-arrow-up"),
+        id="doc-back-to-top",
+        className="doc-back-to-top",
+        title="Back to top",
+        **{"aria-label": "Back to top"},
+    )
+
     return html.Div(
         [
             dbc.Container(
                 [
-                    # Quick Nav
-                    dbc.Card(
-                        [
-                            dbc.CardBody(
-                                [
-                                    html.Div(
-                                        [
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "1",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-rocket-takeoff me-1"
-                                                    ),
-                                                    _t(lang, "nav_quick_start"),
-                                                ],
-                                                href="#quick-start",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "2",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-map me-1"
-                                                    ),
-                                                    _t(lang, "nav_map"),
-                                                ],
-                                                href="#interactive-map",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "3",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-sliders me-1"
-                                                    ),
-                                                    _t(lang, "nav_modes"),
-                                                ],
-                                                href="#modos",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "4",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-geo-alt me-1"
-                                                    ),
-                                                    _t(lang, "nav_usa"),
-                                                ],
-                                                href="#usa-stations",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "5",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-graph-up me-1"
-                                                    ),
-                                                    _t(lang, "nav_results"),
-                                                ],
-                                                href="#resultados",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "6",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-thermometer-half me-1"
-                                                    ),
-                                                    _t(lang, "nav_variables"),
-                                                ],
-                                                href="#variables",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "7",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-cloud-download me-1"
-                                                    ),
-                                                    _t(lang, "nav_sources"),
-                                                ],
-                                                href="#fontes-dados",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "8",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-lightning me-1"
-                                                    ),
-                                                    _t(lang, "nav_features"),
-                                                ],
-                                                href="#funcionalidades",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "9",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-shield-exclamation me-1"
-                                                    ),
-                                                    _t(lang, "nav_limits"),
-                                                ],
-                                                href="#usage-limits",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "10",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-question-circle me-1"
-                                                    ),
-                                                    _t(lang, "nav_faq"),
-                                                ],
-                                                href="#faq",
-                                                className="doc-nav-link",
-                                            ),
-                                            html.A(
-                                                [
-                                                    html.Span(
-                                                        "11",
-                                                        className="doc-nav-number",
-                                                    ),
-                                                    html.I(
-                                                        className="bi bi-file-earmark-text me-1"
-                                                    ),
-                                                    _t(lang, "nav_license"),
-                                                ],
-                                                href="#licenca",
-                                                className="doc-nav-link",
-                                            ),
-                                        ],
-                                        className="doc-nav-container",
-                                    )
-                                ],
-                                className="py-2 px-3",
-                            )
-                        ],
-                        className="mb-4 shadow-sm doc-nav-card",
+                    dbc.Row(
+                        [sidebar, content],
+                        className="doc-layout-row g-4",
                     ),
-                    # All sections
-                    _create_quick_start_section(lang),
-                    _create_interactive_map_section(lang),
-                    _create_operation_modes_section(lang),
-                    _create_usa_stations_section(lang),
-                    _create_results_section(lang),
-                    _create_variables_section(lang),
-                    _create_data_sources_section(lang),
-                    _create_features_section(lang),
-                    _create_usage_limits_section(lang),
-                    _create_faq_section(lang),
-                    _create_license_section(lang),
+                    back_to_top,
                 ],
                 fluid=False,
-                className="py-4",
+                className="py-4 doc-container",
             )
         ],
         className="doc-page-container",

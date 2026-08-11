@@ -32,12 +32,12 @@ def _create_flow_diagram(lang="en"):
     steps = [
         ("👤", _t(lang, "flow", "step1_title", default="User clicks map"),
          _t(lang, "flow", "step1_desc", default="lat/lon → Frontend (Dash callback)"), "primary"),
-        ("📡", _t(lang, "flow", "step2_title", default="POST /api/v1/internal/eto/calculate"),
+        ("📡", _t(lang, "flow", "step2_title", default="Backend request"),
          _t(lang, "flow", "step2_desc", default="FastAPI validates → Celery .delay()"), "info"),
         ("⚙️", _t(lang, "flow", "step3_title", default="Celery Worker"),
-         _t(lang, "flow", "step3_desc", default="Source selection → Download → Preprocess → Fusion → ETo"), "warning"),
-        ("📊", _t(lang, "flow", "step4_title", default="Kalman Filter"),
-         _t(lang, "flow", "step4_desc", default="Adaptive filter on precipitation + ETo"), "success"),
+         _t(lang, "flow", "step3_desc", default="Source selection → Download → Preprocessing (outliers, gap-filling)"), "warning"),
+        ("📊", _t(lang, "flow", "step4_title", default="Kalman Fusion + ETo"),
+         _t(lang, "flow", "step4_desc", default="Multi-source Kalman fusion (precipitation) → FAO-56 PM ETo → final Kalman on ETo"), "success"),
         ("📈", _t(lang, "flow", "step5_title", default="Results"),
          _t(lang, "flow", "step5_desc", default="Redis task-status polling (2s) / WebSocket endpoint → Tables + Plotly charts"), "primary"),
         ("💾", _t(lang, "flow", "step6_title", default="Persistence"),
@@ -99,84 +99,18 @@ def _create_api_clients_section(lang="en"):
         "Elevation": "type_elevation",
     }
 
+    # Dev-focused view: client module + key method + type only.
+    # Coverage, time range, resolution, variables and licenses live in the
+    # user-facing "Data Sources" section of the Documentation page — kept
+    # there to avoid duplication.
     api_data = [
-        {
-            "name": "NASA POWER",
-            "file": "nasa_power_client.py",
-            "coverage": "Global (0.5° x 0.625°)",
-            "time_range": "1990 → today - 2d",
-            "type": "Historical",
-            "variables": "T2M_MAX, T2M_MIN, T2M, RH2M, WS2M, ALLSKY_SFC_SW_DWN, PRECTOTCORR",
-            "icon": "bi-globe-americas",
-            "color": "primary",
-            "key_method": "get_daily_data(lat, lon, start, end)",
-        },
-        {
-            "name": "Open-Meteo Archive",
-            "file": "openmeteo_archive_client.py",
-            "coverage": "Global (0.1° x 0.1° ERA5-Land)",
-            "time_range": "1990 → today - 2d",
-            "type": "Historical",
-            "variables": "temperature_2m_{mean,max,min}, precipitation_sum, et0_fao, shortwave_radiation, RH, wind_10m",
-            "icon": "bi-cloud-sun",
-            "color": "success",
-            "key_method": "get_climate_data(lat, lng, start, end)",
-        },
-        {
-            "name": "Open-Meteo Forecast",
-            "file": "openmeteo_forecast_client.py",
-            "coverage": "Global",
-            "time_range": "today - 29d → today + 5d",
-            "type": "Recent + Forecast",
-            "variables": "Same 10 as Archive",
-            "icon": "bi-cloud-lightning",
-            "color": "info",
-            "key_method": "get_climate_data(lat, lng, start, end)",
-        },
-        {
-            "name": "MET Norway",
-            "file": "met_norway_client.py",
-            "coverage": "Global (9km) / Nordic (2.5km)",
-            "time_range": "today → today + 5d",
-            "type": "Forecast",
-            "variables": "air_temperature, relative_humidity, wind_speed, precipitation_amount",
-            "icon": "bi-snow2",
-            "color": "info",
-            "key_method": "get_forecast_data(lat, lon)",
-        },
-        {
-            "name": "NWS Forecast",
-            "file": "nws_forecast_client.py",
-            "coverage": "USA Continental (24-49°N)",
-            "time_range": "today → today + 5d",
-            "type": "Forecast (USA)",
-            "variables": "temperature, humidity, windSpeed, skyCover, precipitation, dewpoint",
-            "icon": "bi-flag",
-            "color": "danger",
-            "key_method": "get_forecast(lat, lon)",
-        },
-        {
-            "name": "NWS Stations",
-            "file": "nws_stations_client.py",
-            "coverage": "USA Continental (stations)",
-            "time_range": "today - 2d → today",
-            "type": "Real-time observations",
-            "variables": "temperature, dewpoint, humidity, wind (10m→2m FAO-56)",
-            "icon": "bi-broadcast",
-            "color": "danger",
-            "key_method": "_get_grid(lat, lon)",
-        },
-        {
-            "name": "OpenTopoData",
-            "file": "opentopo_client.py",
-            "coverage": "Global (SRTM30m + ASTER)",
-            "time_range": "Static (elevation)",
-            "type": "Elevation",
-            "variables": "elevation_m (for atmospheric pressure, γ)",
-            "icon": "bi-triangle",
-            "color": "secondary",
-            "key_method": "get_elevation(lat, lon)",
-        },
+        {"name": "NASA POWER", "file": "nasa_power_client.py", "type": "Historical", "icon": "bi-globe-americas", "color": "primary", "key_method": "get_daily_data(lat, lon, start, end)"},
+        {"name": "Open-Meteo Archive", "file": "openmeteo_archive_client.py", "type": "Historical", "icon": "bi-cloud-sun", "color": "success", "key_method": "get_climate_data(lat, lng, start, end)"},
+        {"name": "Open-Meteo Forecast", "file": "openmeteo_forecast_client.py", "type": "Recent + Forecast", "icon": "bi-cloud-lightning", "color": "info", "key_method": "get_climate_data(lat, lng, start, end)"},
+        {"name": "MET Norway", "file": "met_norway_client.py", "type": "Forecast", "icon": "bi-snow2", "color": "info", "key_method": "get_forecast_data(lat, lon)"},
+        {"name": "NWS Forecast", "file": "nws_forecast_client.py", "type": "Forecast (USA)", "icon": "bi-flag", "color": "danger", "key_method": "get_forecast(lat, lon)"},
+        {"name": "NWS Stations", "file": "nws_stations_client.py", "type": "Real-time observations", "icon": "bi-broadcast", "color": "danger", "key_method": "_get_grid(lat, lon)"},
+        {"name": "OpenTopoData", "file": "opentopo_client.py", "type": "Elevation", "icon": "bi-triangle", "color": "secondary", "key_method": "get_elevation(lat, lon)"},
     ]
 
     rows = []
@@ -196,17 +130,9 @@ def _create_api_clients_section(lang="en"):
                     html.Td(
                         dbc.Badge(type_label, color=api["color"], pill=True)
                     ),
-                    html.Td(html.Small(api["coverage"])),
-                    html.Td(html.Small(api["time_range"])),
+                    html.Td(html.Code(api["file"], className="small text-info")),
                     html.Td(
                         html.Code(api["key_method"], className="small")
-                    ),
-                    html.Td(
-                        html.Small(
-                            api["variables"],
-                            className="text-muted",
-                            style={"fontSize": "0.75rem"},
-                        )
                     ),
                 ]
             )
@@ -238,7 +164,24 @@ def _create_api_clients_section(lang="en"):
                                     html.Code("*_sync_adapter.py"),
                                     _t(lang, "api_clients", "description_suffix_sync", default=" (sync wrapper for Celery)."),
                                 ],
-                                className="text-muted mb-3",
+                                className="text-muted mb-2",
+                            ),
+                            html.P(
+                                [
+                                    html.I(className="bi bi-info-circle me-1"),
+                                    _t(
+                                        lang,
+                                        "api_clients",
+                                        "see_docs",
+                                        default=(
+                                            "Coverage, resolution, time range, "
+                                            "variables and licenses for each source "
+                                            "are listed in the Documentation → Data "
+                                            "Sources section."
+                                        ),
+                                    ),
+                                ],
+                                className="text-muted small fst-italic mb-3",
                             ),
                             dbc.Table(
                                 [
@@ -247,10 +190,8 @@ def _create_api_clients_section(lang="en"):
                                             [
                                                 html.Th(_t(lang, "api_clients", "th_source", default="Source")),
                                                 html.Th(_t(lang, "api_clients", "th_type", default="Type")),
-                                                html.Th(_t(lang, "api_clients", "th_coverage", default="Coverage")),
-                                                html.Th(_t(lang, "api_clients", "th_time_range", default="Time Range")),
+                                                html.Th(_t(lang, "api_clients", "th_client_file", default="Client file")),
                                                 html.Th(_t(lang, "api_clients", "th_key_method", default="Key Method")),
-                                                html.Th(_t(lang, "api_clients", "th_variables", default="Variables")),
                                             ]
                                         )
                                     ),
@@ -576,12 +517,14 @@ def _create_eto_calculation_section(lang="en"):
 def _create_api_endpoints_section(lang="en"):
     """Tabela de endpoints da API REST."""
 
+    # NOTE: only public routes are listed here. The ETo calculation runs
+    # through internal-only routes that Nginx blocks externally (403) and
+    # that require an internal token — they are intentionally NOT documented
+    # to end users for security and to avoid confusion.
     endpoints = [
         ("GET", "/health", "desc_health", "Basic status + version", "Health"),
         ("GET", "/health/detailed", "desc_health_detailed", "PostgreSQL + Redis + Celery health", "Health"),
         ("GET", "/ready", "desc_ready", "Docker readiness probe", "Health"),
-        ("POST", "/internal/eto/calculate", "desc_eto_calc", "Async ETo calculation → task_id + status metadata (includes websocket_url)", "ETo"),
-        ("POST", "/internal/eto/location-info", "desc_eto_location", "Timezone + elevation for coordinates", "ETo"),
         ("GET", "/climate/sources/available", "desc_climate_sources", "Available sources (optional ?lat=&lon=)", "Climate"),
         ("POST", "/visitors/increment", "desc_visitors_inc", "Increment visitor counter", "Visitors"),
         ("GET", "/visitors/stats", "desc_visitors_stats", "Real-time stats (Redis)", "Visitors"),
@@ -1466,8 +1409,13 @@ def _create_validation_section(lang="en"):
 # =============================================================================
 # QUICK NAV
 # =============================================================================
-def _create_arch_nav(lang="en"):
-    """Quick navigation for architecture page."""
+def _create_arch_sidebar(lang="en"):
+    """Sticky sidebar navigation (scroll-spy) for the architecture page.
+
+    Reuses the same doc-* classes and ``#doc-content`` container as the
+    documentation page, so ``assets/js/documentation.js`` (scroll-spy,
+    back-to-top, section anchors) activates here without changes.
+    """
     nav_items = [
         ("1", "bi-arrow-repeat", _t(lang, "nav", "flow", default="Flow"), "#e2e-flow"),
         ("2", "bi-cloud-download", _t(lang, "nav", "apis", default="APIs"), "#api-clients"),
@@ -1481,26 +1429,35 @@ def _create_arch_nav(lang="en"):
         ("10", "bi-stack", _t(lang, "nav", "tech_stack", default="Tech Stack"), "#tech-stack"),
     ]
 
-    links = []
-    for num, icon, label, href in nav_items:
-        links.append(
-            html.A(
-                [
-                    html.Span(num, className="doc-nav-number"),
-                    html.I(className=f"bi {icon} me-1"),
-                    label,
-                ],
-                href=href,
-                className="doc-nav-link",
-            )
+    nav_links = [
+        html.A(
+            [
+                html.Span(num, className="doc-nav-number"),
+                html.I(className=f"bi {icon} me-2"),
+                html.Span(label, className="doc-nav-text"),
+            ],
+            href=href,
+            className="doc-nav-link",
         )
+        for num, icon, label, href in nav_items
+    ]
 
-    return dbc.Card(
-        dbc.CardBody(
-            html.Div(links, className="doc-nav-container"),
-            className="py-2 px-3",
+    return dbc.Col(
+        html.Div(
+            [
+                html.Div(
+                    [
+                        html.I(className="bi bi-list-ul me-2"),
+                        _t(lang, "nav_contents", default="Contents"),
+                    ],
+                    className="doc-sidebar-title",
+                ),
+                html.Nav(nav_links, className="doc-sidebar-nav"),
+            ],
+            className="doc-sidebar",
         ),
-        className="mb-4 shadow-sm doc-nav-card",
+        md=3,
+        className="doc-sidebar-col",
     )
 
 
@@ -1517,6 +1474,35 @@ def create_architecture_layout(lang="en"):
     Returns:
         html.Div: Layout completo da página
     """
+    sidebar = _create_arch_sidebar(lang)
+
+    content = dbc.Col(
+        html.Div(
+            [
+                _create_e2e_flow_section(lang),
+                _create_api_clients_section(lang),
+                _create_pipeline_section(lang),
+                _create_eto_calculation_section(lang),
+                _create_validation_section(lang),
+                _create_api_endpoints_section(lang),
+                _create_database_section(lang),
+                _create_celery_section(lang),
+                _create_websocket_section(lang),
+                _create_tech_stack_section(lang),
+            ],
+            id="doc-content",
+        ),
+        md=9,
+    )
+
+    back_to_top = html.Button(
+        html.I(className="bi bi-arrow-up"),
+        id="doc-back-to-top",
+        className="doc-back-to-top",
+        title="Back to top",
+        **{"aria-label": "Back to top"},
+    )
+
     return html.Div(
         [
             dbc.Container(
@@ -1539,22 +1525,15 @@ def create_architecture_layout(lang="en"):
                             html.Hr(className="my-4"),
                         ]
                     ),
-                    # Quick navigation
-                    _create_arch_nav(lang),
-                    # Sections
-                    _create_e2e_flow_section(lang),
-                    _create_api_clients_section(lang),
-                    _create_pipeline_section(lang),
-                    _create_eto_calculation_section(lang),
-                    _create_validation_section(lang),
-                    _create_api_endpoints_section(lang),
-                    _create_database_section(lang),
-                    _create_celery_section(lang),
-                    _create_websocket_section(lang),
-                    _create_tech_stack_section(lang),
+                    # Sticky sidebar (scroll-spy) + content
+                    dbc.Row(
+                        [sidebar, content],
+                        className="doc-layout-row g-4",
+                    ),
+                    back_to_top,
                 ],
                 fluid=False,
-                className="py-4",
+                className="py-4 doc-container",
             )
         ],
         className="doc-page-container",
