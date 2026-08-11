@@ -83,6 +83,20 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:-evaonline}
       - REDIS_HOST=redis
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # E-mail (o container 'api' envia o e-mail de VERIFICACAO do modo
+      # historico — precisa da RESEND_API_KEY, senao cai no SMTP e falha)
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://evaonline.app.br}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - RESEND_FROM=${RESEND_FROM:-EVAonline <onboarding@resend.dev>}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_USE_TLS=${SMTP_USE_TLS:-true}
+      - REQUIRE_EMAIL_VERIFICATION=${REQUIRE_EMAIL_VERIFICATION:-True}
+      - GLOBAL_DAILY_CALC_CAP=${GLOBAL_DAILY_CALC_CAP:-2000}
+      - DOWNLOAD_TTL_HOURS=${DOWNLOAD_TTL_HOURS:-48}
     volumes:
       - ./logs:/app/logs
       - ./data:/app/data
@@ -205,6 +219,7 @@ services:
       # Email (Resend API - HTTPS, bypasses SMTP port blocking)
       - RESEND_API_KEY=${RESEND_API_KEY}
       - RESEND_FROM=${RESEND_FROM:-EVAonline <onboarding@resend.dev>}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://evaonline.app.br}
       # SMTP fallback
       - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
       - SMTP_PORT=${SMTP_PORT:-587}
@@ -322,6 +337,7 @@ services:
       # Email (Resend API - HTTPS, bypasses SMTP port blocking)
       - RESEND_API_KEY=${RESEND_API_KEY}
       - RESEND_FROM=${RESEND_FROM:-EVAonline <onboarding@resend.dev>}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://evaonline.app.br}
       # SMTP fallback
       - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
       - SMTP_PORT=${SMTP_PORT:-587}

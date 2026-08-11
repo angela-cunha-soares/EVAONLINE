@@ -432,6 +432,15 @@ docs/*.tex
 docs/*.bib
 docs/figures/
 docs/restructure_*.py
+# LaTeX result tables that went into the published article
+validation/outputs/*.tex
+
+# ===========================================
+# Internal security docs (keep local, not in the public repo)
+# ===========================================
+docs/auditoria_evaonline.md
+docs/plano_fluxo_historico_seguro.md
+docs/checklist_producao_seguranca.md
 
 # ===========================================
 # Archive & Deprecated Docs
