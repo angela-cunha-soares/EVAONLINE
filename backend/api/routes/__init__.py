@@ -5,6 +5,8 @@ from backend.api.routes.eto_routes import eto_router
 from backend.api.routes.health import router as health_router
 from backend.api.routes.geolocation_routes import router as geolocation_router
 from backend.api.routes.visitor_routes import router as visitor_router
+from backend.api.routes.verification_routes import router as verification_router
+from backend.api.routes.download_routes import router as download_router
 
 # ============================================================================
 # API SIMPLIFICADA - Endpoints essenciais
@@ -27,3 +29,9 @@ api_router.include_router(geolocation_router)
 
 # Visitor counter (4 endpoints)
 api_router.include_router(visitor_router)
+
+# Email verification (1 public endpoint)
+api_router.include_router(verification_router)
+
+# Result downloads (public, tokenized, expiring links)
+api_router.include_router(download_router)

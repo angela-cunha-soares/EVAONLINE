@@ -1,0 +1,37 @@
+# =====================================================
+# Override LOCAL para visualizar a interface no navegador
+# Publica o container de desenvolvimento (Dash + FastAPI,
+# com hot-reload do código-fonte) direto em http://localhost:8050
+# sem depender do Nginx/SSL de produção.
+#
+# Uso:
+#   docker compose --profile dev \
+#     -f docker-compose.yml -f docker-compose.local.yml \
+#     up -d --build postgres redis api-dev
+#
+# Depois abra: http://localhost:8050
+#
+# Para parar:
+#   docker compose --profile dev \
+#     -f docker-compose.yml -f docker-compose.local.yml down
+# =====================================================
+services:
+  api-dev:
+    ports:
+      - "127.0.0.1:8050:8000"
+
+  # Worker de dev: consome TODAS as filas, incluindo 'eto' (onde a
+  # calculate_eto_task é roteada). Em produção há um worker dedicado à fila
+  # 'eto'; localmente rodamos um único worker que pega tudo. Sem isso, a task
+  # fica parada na fila 'eto' e a tela roda "calculando" pra sempre.
+  celery-worker-dev:
+    entrypoint: []
+    command:
+      - celery
+      - -A
+      - backend.infrastructure.celery.celery_config:celery_app
+      - worker
+      - --loglevel=info
+      - --pool=solo
+      - --queues=general,eto,eto_processing,data_download,data_processing,elevation
+

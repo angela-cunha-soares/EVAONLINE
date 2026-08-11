@@ -299,6 +299,7 @@ data/cache/
 data/processing/
 data/shapefile/
 data/csv/ST_PLOT.csv
+data/results/
 
 # Keep reference data
 !data/original_data/eto_xavier_csv/*.csv
@@ -399,6 +400,12 @@ core.*
 !backend/tests/unit/core/**
 !frontend/core/
 !frontend/core/**
+
+# Re-ignore Python build artifacts inside the core/ dirs re-included above
+# (the broad `core`/`core.*` patterns un-ignore these via the ! rules).
+backend/core/**/__pycache__/
+frontend/core/**/__pycache__/
+backend/tests/unit/core/**/__pycache__/
 
 # ===========================================
 # Security & Development Scripts

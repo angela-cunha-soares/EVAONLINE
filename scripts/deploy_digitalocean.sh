@@ -208,6 +208,15 @@ SECURE_HEADERS_ENABLED=True
 SECURE_HEADERS_HSTS=False
 SECURE_HEADERS_CSP=True
 
+# Base pública (usada nos links de verificação e de download por e-mail)
+PUBLIC_BASE_URL=https://evaonline.app.br
+# Modo histórico: exige confirmação de e-mail (uma vez a cada 30 dias)
+REQUIRE_EMAIL_VERIFICATION=True
+# Teto diário global de cálculos (protege as cotas das APIs externas)
+GLOBAL_DAILY_CALC_CAP=2000
+# Link de download expira em (horas)
+DOWNLOAD_TTL_HOURS=48
+
 # PERFORMANCE
 API_MAX_CONNECTIONS=50
 API_TIMEOUT=30
@@ -225,13 +234,18 @@ DASH_INCLUDE_ASSETS_FILES=True
 DASH_DEBUG=False
 FASTAPI_RELOAD=False
 
-# EMAIL (configure com suas credenciais reais)
-EMAIL_BACKEND=smtp
+# EMAIL (Resend — necessário para o modo histórico: verificação + link 48h)
+# O código usa Resend se RESEND_API_KEY estiver preenchido; senão cai no SMTP.
+# >>> COLE SUA CHAVE REAL DO RESEND ABAIXO ANTES DE USAR O MODO HISTÓRICO <<<
+EMAIL_BACKEND=resend
+RESEND_API_KEY=
+RESEND_FROM=EVAonline <noreply@evaonline.app.br>
+# Fallback SMTP (opcional — só usado se RESEND_API_KEY ficar vazio)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASSWORD=
-SMTP_FROM=noreply@evaonline.com
+SMTP_FROM=noreply@evaonline.app.br
 SMTP_USE_TLS=true
 
 # NGINX
@@ -419,7 +433,7 @@ echo "    docker compose -f /opt/evaonline/docker-compose.yml restart"
 echo ""
 echo -e "  ${YELLOW}NEXT STEPS:${NC}"
 echo "  1. Change root password:    passwd"
-echo "  2. Configure email SMTP:    nano /opt/evaonline/.env"
+echo "  2. Cole a RESEND_API_KEY:    nano /opt/evaonline/.env  (modo historico nao envia e-mail sem ela)"
 echo "  3. Verify SSL certificate:  curl -I https://evaonline.app.br"
 echo "  4. DigitalOcean Firewall:   Create via DO Control Panel"
 echo "  5. Check credentials:       cat /root/evaonline_credentials.txt"

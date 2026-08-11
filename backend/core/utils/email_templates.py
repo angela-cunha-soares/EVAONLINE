@@ -4,7 +4,7 @@ Bilingual support: English (en) and Portuguese (pt).
 
 Similar ao fluxo do BDMEP/INMET:
 1. Email de confirmação: Solicitação recebida, processamento iniciado
-2. Email final: Dados processados com arquivo em anexo
+2. Email final: Dados processados com link de download (48h)
 """
 
 from datetime import datetime
@@ -76,12 +76,12 @@ _EMAIL_TRANSLATIONS = {
     },
     "started_next_steps_body": {
         "en": (
-            "You will receive another email with the data attached once "
+            "You will receive another email with a download link once "
             "processing is complete. The estimated time is 1 to 5 minutes, "
             "depending on the requested period."
         ),
         "pt": (
-            "Você receberá outro email com os dados em anexo assim que o "
+            "Você receberá outro email com um link de download assim que o "
             "processamento for concluído. O tempo estimado é de 1 a 5 minutos, "
             "dependendo do período solicitado."
         ),
@@ -109,11 +109,13 @@ _EMAIL_TRANSLATIONS = {
     "ready_body": {
         "en": (
             "The processing of your reference evapotranspiration (ETo) data "
-            "has been completed successfully. The file is attached to this email."
+            "has been completed successfully. Use the download button below "
+            "to get your file (link valid for 48 hours)."
         ),
         "pt": (
             "O processamento dos seus dados de evapotranspiração de referência (ETo) "
-            "foi concluído com sucesso. O arquivo está anexado a este email."
+            "foi concluído com sucesso. Use o botão de download abaixo para "
+            "obter o arquivo (link válido por 48 horas)."
         ),
     },
     "ready_success": {
@@ -429,14 +431,40 @@ def create_data_ready_email(
     elevation: Optional[float] = None,
     summary_stats: Optional[dict] = None,
     lang: str = "en",
+    download_url: Optional[str] = None,
+    expiry_hours: int = 48,
 ) -> tuple[str, str]:
     """
-    Cria email informando que os dados estão prontos (com arquivo anexo).
+    Cria email informando que os dados estão prontos.
+
+    Se ``download_url`` for fornecido, inclui um botão de download (link que
+    expira em ``expiry_hours``) em vez de depender de anexo.
 
     Returns:
         tuple: (subject, html_body)
     """
     subject = _t(lang, "ready_subject")
+
+    # Bloco do botão de download (link que expira)
+    _is_pt = str(lang).lower().startswith("pt")
+    download_html = ""
+    if download_url:
+        _btn = "⬇ Baixar resultados" if _is_pt else "⬇ Download results"
+        _exp = (
+            f"O link expira em {expiry_hours} horas. Após esse período o "
+            f"arquivo é removido automaticamente."
+            if _is_pt
+            else f"This link expires in {expiry_hours} hours. After that the "
+            f"file is removed automatically."
+        )
+        download_html = f"""
+        <div style="text-align:center;margin:24px 0;">
+            <a href="{download_url}" style="display:inline-block;background:#1a5f2a;
+               color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:8px;
+               font-weight:bold;font-size:16px;">{_btn}</a>
+            <p style="color:#888;font-size:13px;margin:12px 0 0;">{_exp}</p>
+        </div>
+        """
 
     format_label = (
         _t(lang, "format_excel")
@@ -530,7 +558,7 @@ def create_data_ready_email(
                         {days_processed_text}
                     </p>
                 </div>
-                
+                {download_html}
                 <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
                     <tr style="background: #1a5f2a; color: white;">
                         <td colspan="2" style="padding: 12px; font-weight: bold;">

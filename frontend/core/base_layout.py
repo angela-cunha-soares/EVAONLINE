@@ -29,9 +29,11 @@ def create_base_layout():
             dcc.Store(
                 id="navigation-coordinates", storage_type="session", data=None
             ),
-            # Store para identificação única da sessão do usuário (sessionStorage)
-            # Cada aba/janela do navegador terá um ID único
-            dcc.Store(id="app-session-id", storage_type="session", data=None),
+            # Store de identificação do usuário (localStorage → persiste por
+            # navegador, entre abas/janelas e reinícios). Usado como
+            # identificador estável para o rate-limiting; evita que abrir uma
+            # nova aba/janela zere a cota diária.
+            dcc.Store(id="app-session-id", storage_type="local", data=None),
             # Flag: visitante já foi contabilizado nesta sessão?
             dcc.Store(
                 id="visitor-incremented",

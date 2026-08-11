@@ -21,8 +21,17 @@ from backend.api.services.climate_source_manager import ClimateSourceManager
 # Rate limiter per-IP
 from backend.api.middleware.rate_limiter import (
     check_calculation_limit,
+    check_global_daily_cap,
     track_calculation,
+    track_global_calculation,
 )
+
+# Security / abuse protection
+from backend.api.security.internal_auth import verify_internal_token
+from backend.api.security import abuse_monitor
+from backend.api.security import email_verification
+from backend.api.security.proof_of_work import verify_solution
+from config.settings.app_config import get_settings
 
 # Importar task Celery para cálculos assíncronos
 from backend.infrastructure.celery.tasks.eto_calculation import (
@@ -72,6 +81,7 @@ class EToCalculationRequest(BaseModel):
     session_id: Optional[str] = None  # ID da sessão
     file_format: Optional[str] = "csv"  # csv (padrão) ou excel
     lang: Optional[str] = "en"  # Language for email templates (en/pt)
+    pow_nonce: Optional[str] = None  # Proof-of-work solution (anti-bot)
 
 
 class LocationInfoRequest(BaseModel):
@@ -91,6 +101,7 @@ async def calculate_eto(
     request: EToCalculationRequest,
     fastapi_request: Request,
     db: Session = Depends(get_db),  # type: ignore[arg-type] # noqa: B008
+    _internal: None = Depends(verify_internal_token),  # noqa: B008
 ) -> Dict[str, Any]:
     """
     🚀 Cálculo ETo assíncrono com progresso em tempo real.
@@ -129,12 +140,50 @@ async def calculate_eto(
             or "unknown"
         )
         period_type_str = (request.period_type or "dashboard_current").lower()
+        is_historical = period_type_str == "historical_email"
 
+        sec = get_settings()
+        # UX-changing protections are skipped in the automated test env.
+        _sec_active = sec.ENVIRONMENT != "testing"
+
+        # 0a. Proof-of-work (anti-bot) for dashboard modes, if enabled.
+        if _sec_active and sec.REQUIRE_POW and not is_historical:
+            pow_subject = request.visitor_id or client_ip
+            if not verify_solution(pow_subject, request.pow_nonce or ""):
+                abuse_monitor.record_block(
+                    "visitor_id" if request.visitor_id else "IP",
+                    pow_subject,
+                    period_type_str,
+                    reason="pow_failed",
+                )
+                raise HTTPException(
+                    status_code=403,
+                    detail="Anti-bot verification failed. Please retry.",
+                )
+
+        # 0b. Per-user rate limit (IP + visitor_id + email).
         allowed, rate_msg = check_calculation_limit(
-            client_ip, period_type_str, visitor_id=request.visitor_id
+            client_ip,
+            period_type_str,
+            visitor_id=request.visitor_id,
+            email=request.email,
         )
         if not allowed:
+            abuse_monitor.record_block(
+                "email" if request.email else "IP",
+                request.email or client_ip,
+                period_type_str,
+                reason="rate_limit",
+            )
             raise HTTPException(status_code=429, detail=rate_msg)
+
+        # 0c. Site-wide daily cap (protects external API quotas).
+        global_ok, global_msg = check_global_daily_cap()
+        if not global_ok:
+            raise HTTPException(status_code=429, detail=global_msg)
+
+        # (A verificação de e-mail do histórico acontece adiante, DEPOIS de
+        #  resolver as fontes/elevação, para guardar o job exato como pendente.)
 
         # 0b. Normalizar period_type para OperationMode
 
@@ -201,22 +250,69 @@ async def calculate_eto(
                 f"será obtida via API"
             )
 
-        # 5. Iniciar cálculo ETo assíncrono (Celery task)
-        # Em vez de processar sincronamente, delegar para worker
-        task = calculate_eto_task.delay(  # type: ignore[attr-defined]
+        # 5. Montar os kwargs resolvidos do job (usados no dispatch OU como
+        #    pedido pendente aguardando confirmação de e-mail).
+        task_kwargs = dict(
             lat=request.lat,
             lon=request.lng,
             start_date=request.start_date,
             end_date=request.end_date,
-            sources=selected_sources,  # Lista de fontes (uma ou várias)
+            sources=selected_sources,
             elevation=elevation,
-            mode=operation_mode.value,  # String do modo
-            email=request.email,  # Email para notificações
-            visitor_id=request.visitor_id,  # ID único do visitante
-            session_id=request.session_id,  # ID da sessão
-            file_format=request.file_format,  # Formato: excel ou csv
-            enable_fusion=enable_fusion,  # Flag de fusão Kalman
-            lang=request.lang,  # Language for email templates
+            mode=operation_mode.value,
+            email=request.email,
+            visitor_id=request.visitor_id,
+            session_id=request.session_id,
+            file_format=request.file_format,
+            enable_fusion=enable_fusion,
+            lang=request.lang,
+        )
+
+        # 5a. Confirmação híbrida (histórico): se o e-mail NÃO estiver
+        # verificado, NÃO despacha — guarda o job exato como pendente e envia
+        # o link de confirmação; clicar nele enfileira este mesmo job.
+        # Gate autoritativo no servidor (o do frontend é só UX).
+        if _sec_active and is_historical and sec.REQUIRE_EMAIL_VERIFICATION:
+            verified_now = bool(
+                request.email
+                and email_verification.is_verified(request.email)
+            )
+            logger.info(
+                f"🔎 Historical gate: email={request.email!r} "
+                f"verified={verified_now}"
+            )
+            if not verified_now:
+                if request.email:
+                    email_verification.send_verification(
+                        request.email,
+                        lang=request.lang or "en",
+                        pending=task_kwargs,
+                    )
+                # Conta a requisição no limite diário mesmo pendente
+                # (evita flood de pedidos/e-mails de confirmação).
+                track_calculation(
+                    client_ip,
+                    period_type_str,
+                    visitor_id=request.visitor_id,
+                    email=request.email,
+                )
+                track_global_calculation()
+                logger.warning(
+                    f"🚫 Historical NOT dispatched — e-mail não verificado: "
+                    f"{request.email!r}; link de confirmação enviado."
+                )
+                return {
+                    "status": "verification_required",
+                    "message": (
+                        "Requisição registrada. Confira sua caixa de entrada "
+                        "(e o spam) e clique no link de confirmação — o "
+                        "cálculo entrará na fila de processamento."
+                    ),
+                }
+
+        # 5b. Despacho (e-mail verificado, ou modos não-histórico).
+        task = calculate_eto_task.delay(  # type: ignore[attr-defined]
+            **task_kwargs
         )
 
         task_id = task.id
@@ -225,8 +321,14 @@ async def calculate_eto(
             f"({request.lat}, {request.lng}) - Fontes: {selected_sources}"
         )
 
-        # 5b. Track calculation for rate limiting
-        track_calculation(client_ip, period_type_str, visitor_id=request.visitor_id)
+        # 5b. Track calculation for rate limiting (per-user + site-wide)
+        track_calculation(
+            client_ip,
+            period_type_str,
+            visitor_id=request.visitor_id,
+            email=request.email,
+        )
+        track_global_calculation()
 
         # 6. Retornar task_id para monitoramento via WebSocket
         return {
@@ -314,3 +416,46 @@ async def get_location_info(request: LocationInfoRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=500, detail=f"Failed to get location info: {str(e)}"
         )
+
+
+# ============================================================================
+# EMAIL VERIFICATION (novo fluxo do modo Histórico)
+# ============================================================================
+
+
+class VerificationRequest(BaseModel):
+    """Solicitação para enviar o e-mail de verificação (modo histórico)."""
+
+    email: str
+    lang: Optional[str] = "en"
+
+
+@eto_router.post("/request-verification")
+async def request_email_verification(
+    request: VerificationRequest,
+    _internal: None = Depends(verify_internal_token),  # noqa: B008
+) -> Dict[str, Any]:
+    """
+    Envia o e-mail de confirmação (se ainda não verificado).
+
+    Chamado quando o usuário clica em "Confirme seu e-mail" no modo histórico,
+    ANTES de liberar datas/formato/cálculo.
+    """
+    email = (request.email or "").strip()
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Invalid email")
+
+    if email_verification.is_verified(email):
+        return {"status": "verified", "verified": True}
+
+    sent = email_verification.send_verification(email, lang=request.lang or "en")
+    return {"status": "sent" if sent else "error", "verified": False}
+
+
+@eto_router.get("/verification-status")
+async def email_verification_status(
+    email: str,
+    _internal: None = Depends(verify_internal_token),  # noqa: B008
+) -> Dict[str, Any]:
+    """Retorna se o e-mail já foi confirmado (usado pelo polling do frontend)."""
+    return {"verified": email_verification.is_verified((email or "").strip())}

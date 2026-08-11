@@ -262,7 +262,7 @@ def create_sidebar_card():
                                                 ),
                                                 html.Span("Forecast"),
                                                 html.Small(
-                                                    " (5 days)",
+                                                    " (6 days)",
                                                     className="text-muted ms-1",
                                                 ),
                                             ],
@@ -314,8 +314,12 @@ def create_sidebar_card():
                         n_clicks=0,
                         disabled=True,
                     ),
-                    # Feedback areas
-                    html.Div(id="validation-alert", className="mt-3"),
+                    # Feedback areas (spinner imediato enquanto processa)
+                    dcc.Loading(
+                        html.Div(id="validation-alert", className="mt-3"),
+                        type="dot",
+                        color="#1a7a3a",
+                    ),
                     html.Div(id="operation-mode-indicator", className="mt-2"),
                     html.Div(
                         id="calculation-success-status", className="mt-2"
@@ -416,6 +420,8 @@ def create_map_card():
                         ],
                         className="mt-1 px-2",
                     ),
+                    # Painel "Como funciona" (aparece só no modo Histórico)
+                    html.Div(id="historical-info-panel", className="mt-3"),
                 ],
                 className="p-2",
             ),

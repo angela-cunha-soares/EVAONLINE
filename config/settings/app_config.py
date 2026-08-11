@@ -262,6 +262,51 @@ class Settings(BaseSettings):
         description="Secret key for sessions",
     )
 
+    # ---- Security / abuse protection ----
+    PUBLIC_BASE_URL: str = Field(
+        default="https://evaonline.app.br",
+        description="Public base URL (used to build email verification links)",
+    )
+    INTERNAL_API_TOKEN: str = Field(
+        default="",
+        description=(
+            "Shared secret between the Dash server and the internal API. "
+            "If empty, derived from SECRET_KEY. Enforced only in production."
+        ),
+    )
+    GLOBAL_DAILY_CALC_CAP: int = Field(
+        default=2000,
+        description="Site-wide daily calculation cap (protects external API quotas)",
+    )
+    REQUIRE_EMAIL_VERIFICATION: bool = Field(
+        default=True,
+        description="Require a one-time email confirmation for historical mode",
+    )
+    REQUIRE_POW: bool = Field(
+        default=False,
+        description="Require a proof-of-work solution for dashboard modes (anti-bot)",
+    )
+    POW_DIFFICULTY_BITS: int = Field(
+        default=16, description="Proof-of-work difficulty (leading zero bits)"
+    )
+    ABUSE_ALERT_THRESHOLD: int = Field(
+        default=20,
+        description="Blocks/day from one identifier before an alert is raised",
+    )
+    ALERT_WEBHOOK_URL: str = Field(
+        default="",
+        description="Optional webhook (Discord/Slack) for abuse alerts",
+    )
+    # Result download links (historical mode)
+    DOWNLOAD_TTL_HOURS: int = Field(
+        default=48,
+        description="Hours a generated result file stays available for download",
+    )
+    RESULTS_STORAGE_DIR: str = Field(
+        default="data/results",
+        description="Directory where generated result files are stored",
+    )
+
     # Timezone
     TIMEZONE: str = Field(
         default="America/Sao_Paulo", description="Application timezone"
@@ -299,6 +344,20 @@ class Settings(BaseSettings):
             self.celery.BROKER_URL = self.redis.redis_url
         if not self.celery.RESULT_BACKEND:
             self.celery.RESULT_BACKEND = self.redis.redis_url
+
+        # Segurança: se o Redis exige senha mas a URL do broker/backend veio
+        # sem autenticação (ex.: CELERY_BROKER_URL=redis://redis:6379/0 no
+        # .env), o dispatch falha com "NOAUTH Authentication required".
+        # Neste caso, usar a URL autenticada derivada do Redis.
+        if self.redis.PASSWORD:
+            auth_url = self.redis.redis_url
+            if self.celery.BROKER_URL and "@" not in self.celery.BROKER_URL:
+                self.celery.BROKER_URL = auth_url
+            if (
+                self.celery.RESULT_BACKEND
+                and "@" not in self.celery.RESULT_BACKEND
+            ):
+                self.celery.RESULT_BACKEND = auth_url
 
     @field_validator("ENVIRONMENT")
     @classmethod
