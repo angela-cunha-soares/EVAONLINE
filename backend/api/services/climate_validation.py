@@ -572,6 +572,12 @@ class ClimateValidationService:
                     end_date,
                     allow_future=effective_allow_future,
                     max_future_days=max_future_days,
+                    # Use a mesma referência de "hoje" (fuso da localização) que
+                    # o frontend e o validate_request_mode usam. Sem isto, esta
+                    # checagem cai no UTC e um ponto a leste de Greenwich vê o
+                    # end_date (hoje local) como "futuro" perto da virada do dia.
+                    lat=lat,
+                    lng=lon,
                 ),
             )
         )
