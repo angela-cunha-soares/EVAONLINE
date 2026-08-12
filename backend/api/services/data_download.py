@@ -176,17 +176,23 @@ async def download_weather_data(
             sources = source_result["sources"]
             warnings_list.extend(source_result["warnings"])
 
-            # Validate that all requested sources are available
+            # Some requested sources may not cover the TAIL of the range
+            # (NASA POWER / Open-Meteo Archive have a ~2-3 day lag, while the
+            # Recent mode ends today). That is expected in the multi-source
+            # design: Open-Meteo Forecast fills the recent gap. So we proceed
+            # with whatever is available and only fail if NOTHING is available
+            # (handled just below by the "No sources available" check).
             unavailable = set(requested_sources) - set(sources)
             if unavailable:
-                msg = (
-                    f"Sources unavailable for ({latitude}, {longitude}): "
-                    f"{unavailable}"
+                warn = (
+                    f"Sources partially unavailable for "
+                    f"({latitude}, {longitude}): {unavailable}. "
+                    f"Proceeding with: {sources}"
                 )
-                logger.error(msg)
-                raise ValueError(msg)
+                warnings_list.append(warn)
+                logger.warning(warn)
 
-            logger.info(f"Specific sources selected: {sources}")
+            logger.info(f"Sources selected: {sources}")
         except ValueError as e:
             msg = f"Error validating sources: {str(e)}"
             logger.error(msg)
