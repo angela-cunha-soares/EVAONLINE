@@ -1,5 +1,4 @@
 name: Criar VM ARM Oracle
-
 on:
   schedule:
     - cron: '*/20 * * * *'
@@ -19,43 +18,64 @@ jobs:
         run: |
           curl -sL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh -o install.sh
           bash install.sh --accept-all-defaults >/dev/null
-          echo "$HOME/bin" >> $GITHUB_PATH
+          echo "$HOME/bin" >> "$GITHUB_PATH"
 
       - name: Tentar criar a VM
         run: |
+          set -uo pipefail
           C="${{ secrets.OCI_CLI_TENANCY }}"
           SUBNET="ocid1.subnet.oc1.sa-saopaulo-1.aaaaaaaarl7ii6jlweguwmeit73kuiv37liye5nfp3dimhowm3iedpjajrea"
           echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBzlsFtS/JvjJ8PX5C3k/p1AA4GJwOAI5hGN3CG7jbIHyuylXl6ObcGFm2CqQIMvtcskIRQaPMPijuHWGQlH3fG8dQiGCbGMoDk4KmDBt5ni177I+qKX/1ChsSuhpV8aGoXH8m6sjaa8DbRbNunHduq8Gm/uxfNaBVfUJ2tmVJHpQ2eMxfu0U8QXDctDxBJKhkSM5RASGLbUGjNvX92GkD1Ok3XhUA7lhBm+cI1xZg8uQgz8inBH+c9yPZ0rmgi0OFwZkkUuuJy9knasMQVzQUUGEkwCKSlYia8w5MyaaVtD2vcPdQuNiJbxQuaJ95I8OLA9ifeS+de1+MJs+Cwuyj angelassil@54ebc6d8a9f9" > /tmp/key.pub
 
           AD=$(oci iam availability-domain list --compartment-id "$C" --query 'data[0].name' --raw-output)
-          IMG=$(oci compute image list --compartment-id "$C" --operating-system "Canonical Ubuntu" --operating-system-version "22.04" --shape "VM.Standard.A1.Flex" --sort-by TIMECREATED --query 'data[0].id' --raw-output)
+          echo "AD: $AD"
 
-          EXIST=$(oci compute instance list --compartment-id "$C" --display-name "evaonline-server" --lifecycle-state RUNNING --query 'data[0].id' --raw-output 2>/dev/null)
+          IMG=$(oci compute image list --compartment-id "$C" \
+            --operating-system "Canonical Ubuntu" --operating-system-version "22.04" \
+            --shape "VM.Standard.A1.Flex" --sort-by TIMECREATED \
+            --query 'data[0].id' --raw-output)
+          if [ -z "$IMG" ] || [ "$IMG" = "null" ]; then
+            echo "Nao encontrei imagem Ubuntu 22.04 para A1. Abortando este ciclo."
+            exit 1
+          fi
+          echo "IMG: $IMG"
+
+          # Nao recriar se ja existe uma instancia nao-terminada com esse nome
+          EXIST=$(oci compute instance list --compartment-id "$C" \
+            --display-name "evaonline-server" \
+            --query "data[?\"lifecycle-state\"!='TERMINATED'] | [0].id" \
+            --raw-output 2>/dev/null)
           if [ -n "$EXIST" ] && [ "$EXIST" != "null" ]; then
-            echo "A VM ja existe e esta RUNNING: $EXIST"
+            echo "Ja existe uma instancia evaonline-server (nao terminada): $EXIST"
             exit 0
           fi
 
           CREATED=0
-          for CONFIG in "4 24" "2 12" "1 6"; do
+          # Novo limite da conta: 2 OCPU / 12 GB. Comeca no maximo permitido.
+          for CONFIG in "2 12" "1 6"; do
             set -- $CONFIG
             OCPUS=$1; MEM=$2
             echo "=========================================="
             echo ">> Tentando $OCPUS OCPU / $MEM GB ..."
             OUT=$(oci compute instance launch \
               --availability-domain "$AD" --compartment-id "$C" \
-              --shape "VM.Standard.A1.Flex" --shape-config "{\"ocpus\":$OCPUS,\"memoryInGBs\":$MEM}" \
+              --shape "VM.Standard.A1.Flex" \
+              --shape-config "{\"ocpus\":$OCPUS,\"memoryInGBs\":$MEM}" \
               --image-id "$IMG" --subnet-id "$SUBNET" --assign-public-ip true \
               --display-name "evaonline-server" \
               --ssh-authorized-keys-file /tmp/key.pub \
-              --boot-volume-size-in-gbs 100 2>&1) || true
+              --boot-volume-size-in-gbs 50 2>&1) || true
 
-            if echo "$OUT" | grep -qi '"id"'; then
+            if echo "$OUT" | grep -qi 'ocid1.instance'; then
               echo "🎉 SUCESSO! VM criada com $OCPUS OCPU / $MEM GB."
+              echo "$OUT" | grep -i 'ocid1.instance' | head -1
               CREATED=1
               break
-            elif echo "$OUT" | grep -qi "capacity"; then
-              echo "   Sem capacidade para $OCPUS/$MEM. Tentando a proxima opcao..."
+            elif echo "$OUT" | grep -qiE 'out of host capacity|capacity'; then
+              echo "   Sem capacidade para $OCPUS/$MEM. Tentando proxima opcao..."
+            elif echo "$OUT" | grep -qiE 'limitexceeded|exceed(ed)? the .*limit|service limit'; then
+              echo "   Limite da conta atingido em $OCPUS/$MEM (reduza a config):"
+              echo "$OUT" | grep -Ei '"code"|"message"' | head -3
             else
               echo "   Erro diferente em $OCPUS/$MEM:"
               echo "$OUT" | grep -Ei '"code"|"message"' | head -3
