@@ -87,24 +87,22 @@ def calculate_eto_task(
 
     def run_async_safely(coro):
         """Run async coroutine safely in Celery worker (handles closed loops)."""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         nest_asyncio.apply(loop)
-        return loop.run_until_complete(coro)
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
 
     task_id = self.request.id
     start_time = datetime.now()
 
     try:
         # ========== STEP 0: EMAIL INICIAL (modo historical_email) ==========
-        if mode and "email" in mode.lower() and email:
+        # So na 1a tentativa: nao reenviar "iniciado" em cada retry.
+        if mode and "email" in mode.lower() and email and self.request.retries == 0:
             from backend.core.utils.email_utils import (
                 send_html_email,
                 validate_email,
@@ -353,6 +351,7 @@ def calculate_eto_task(
         from backend.database.data_storage import save_climate_data
         from backend.database.connection import get_db
 
+        db = None
         try:
             db = next(get_db())
             # Preparar dados para salvar
@@ -384,7 +383,8 @@ def calculate_eto_task(
         except Exception as save_error:
             logger.warning(f"⚠️ Erro ao salvar no banco: {save_error}")
         finally:
-            db.close()
+            if db is not None:
+                db.close()
 
         # ========== STEP 6: ENVIO DE EMAIL (modo historical_email) ==========
         email_sent = False
@@ -559,7 +559,27 @@ def calculate_eto_task(
     except Exception as e:
         logger.error(f"❌ Task {task_id} failed: {e}", exc_info=True)
 
-        # Enviar email de erro se possível
+        # Retry SOMENTE para erros transitorios de rede/API (timeout, conexao,
+        # HTTP 5xx). Validacao e bugs de codigo NAO sao retentados. Nao envia
+        # e-mail aqui: so na falha DEFINITIVA, para nao mandar "erro" quando um
+        # retry seguinte vai dar certo.
+        import httpx
+        from celery.exceptions import SoftTimeLimitExceeded
+
+        is_retryable = False
+        if not isinstance(e, SoftTimeLimitExceeded):
+            if isinstance(
+                e, (httpx.TransportError, ConnectionError, TimeoutError)
+            ):
+                is_retryable = True
+            elif isinstance(e, httpx.HTTPStatusError):
+                is_retryable = e.response.status_code >= 500
+        if is_retryable and self.request.retries < self.max_retries:
+            raise self.retry(
+                exc=e, countdown=30 * (self.request.retries + 1)
+            )
+
+        # Falha definitiva: avisar o usuario por e-mail UMA unica vez.
         if mode and "email" in mode.lower() and email:
             try:
                 from backend.core.utils.email_utils import (
@@ -587,25 +607,6 @@ def calculate_eto_task(
             except Exception as email_err:
                 logger.error(f"Falha ao enviar email de erro: {email_err}")
 
-        # Retry apenas para erros de rede/API, não para validação
-        if isinstance(e, (ValueError, TypeError)):
-            # Erros de validação: falhar imediatamente sem retry
-            return {
-                "error": str(e),
-                "task_id": task_id,
-                "mode": mode,
-                "processing_time_seconds": round(
-                    (datetime.now() - start_time).total_seconds(), 2
-                ),
-            }
-
-        # Erros de rede/API: retry com backoff (max 2 tentativas)
-        if self.request.retries < self.max_retries:
-            raise self.retry(
-                exc=e, countdown=30 * (self.request.retries + 1)
-            )
-
-        # Esgotou retries: retornar erro
         return {
             "error": str(e),
             "task_id": task_id,

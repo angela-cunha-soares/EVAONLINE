@@ -17,7 +17,7 @@ from redis import Redis
 from config.settings.app_config import get_settings
 
 _KEY_PREFIX = "pending_req:"
-DEFAULT_TTL = 1800  # 30 min (matches the verification token)
+DEFAULT_TTL = 86400  # 24h - janela confortavel para o usuario clicar no link
 
 
 def _redis() -> Redis:
@@ -40,10 +40,11 @@ def consume(token: str) -> Optional[dict]:
         return None
     try:
         redis = _redis()
-        raw = redis.get(_KEY_PREFIX + token)
+        # GETDEL e atomico (Redis 6.2+): elimina a corrida de dois cliques
+        # simultaneos no link enfileirarem o mesmo job duas vezes.
+        raw = redis.getdel(_KEY_PREFIX + token)
         if not raw:
             return None
-        redis.delete(_KEY_PREFIX + token)
         return json.loads(raw)
     except Exception as exc:
         logger.error(f"pending_request.consume error: {exc}")

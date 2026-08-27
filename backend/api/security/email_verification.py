@@ -28,7 +28,7 @@ from redis import Redis
 from config.settings.app_config import get_settings
 
 VERIFIED_TTL = 86400 * 30         # 30 days
-TOKEN_TTL = 1800                  # 30 minutes
+TOKEN_TTL = 86400                # 24 hours
 SEND_COOLDOWN = 300               # 5 minutes between verification emails
 
 
@@ -71,7 +71,7 @@ def _build_message(link: str, lang: str) -> tuple[str, str]:
             "EVAonline usando este e-mail. Para confirmar que o endereço é "
             "seu e receber os resultados, clique no link abaixo:\n\n"
             f"{link}\n\n"
-            "O link expira em 30 minutos. Após a confirmação, o e-mail "
+            "O link expira em 24 horas. Após a confirmação, o e-mail "
             "permanece válido por 30 dias; depois desse período será "
             "necessário confirmá-lo novamente. Se você não fez essa "
             "solicitação, ignore este e-mail." + footer_pt
@@ -84,7 +84,7 @@ def _build_message(link: str, lang: str) -> tuple[str, str]:
             "using this email. To confirm the address is yours and receive "
             "the results, click the link below:\n\n"
             f"{link}\n\n"
-            "The link expires in 30 minutes. Once confirmed, the email stays "
+            "The link expires in 24 hours. Once confirmed, the email stays "
             "valid for 30 days; after that you will need to confirm it again. "
             "If you did not make this request, please ignore this email."
             + footer_en
