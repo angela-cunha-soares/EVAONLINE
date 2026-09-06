@@ -108,7 +108,7 @@ def send_verification(
 
     Returns True if an email was sent (or already recently sent).
     """
-    from backend.core.utils.email_utils import send_email
+    from backend.core.utils.email_utils import send_html_email
     from backend.api.security import pending_request
 
     norm = _norm(email)
@@ -131,7 +131,17 @@ def send_verification(
         base = get_settings().PUBLIC_BASE_URL.rstrip("/")
         link = f"{base}/api/v1/verify/email?token={token}"
         subject, body = _build_message(link, lang)
-        ok = send_email(norm, subject, body)
+        import html as _html
+        _safe = _html.escape(body).replace(
+            _html.escape(link),
+            f'<a href="{_html.escape(link)}">{_html.escape(link)}</a>',
+        )
+        html_body = (
+            '<div style="font-family:Arial,sans-serif;font-size:14px;'
+            'line-height:1.55;color:#222;white-space:pre-wrap">'
+            f'{_safe}</div>'
+        )
+        ok = send_html_email(norm, subject, html_body)
         if not ok:
             logger.error(f"Failed to send verification email to {norm}")
         return ok
