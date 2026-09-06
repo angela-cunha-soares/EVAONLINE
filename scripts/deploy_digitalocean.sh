@@ -312,7 +312,13 @@ mkdir -p "$APP_DIR/data"
 mkdir -p "$APP_DIR/temp"
 mkdir -p "$APP_DIR/docker/nginx/ssl"
 
-log_ok "Directories created"
+# The app container runs as the non-root user 'evaonline' (UID 1000, per
+# Dockerfile). logs/ and data/ are bind-mounted into the container, so they
+# must be owned by that UID — otherwise the app cannot create its log files
+# and the API container fails to start (PermissionError on /app/logs).
+chown -R 1000:1000 "$APP_DIR/logs" "$APP_DIR/data" "$APP_DIR/temp"
+
+log_ok "Directories created (owned by app UID 1000)"
 
 # -----------------------------------------------------------------------------
 # Step 7/9: Build and Start Services (HTTP only initially)
