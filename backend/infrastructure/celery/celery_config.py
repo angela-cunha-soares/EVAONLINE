@@ -170,7 +170,11 @@ celery_app.conf.update(
     result_serializer="json",
     # Resultados - CRÍTICO para frontend ler via Redis
     result_extended=True,  # Salva metadados extras (status, result, etc)
-    result_expires=3600,  # Expira em 1 hora
+    result_expires=86400,  # 24h - evita o resultado sumir antes do frontend reler
+    # Teto de tempo: mata jobs travados (ex.: API externa pendurada). O soft
+    # limit dispara SoftTimeLimitExceeded antes do kill, permitindo e-mail de erro.
+    task_soft_time_limit=int(os.getenv("CELERY_TASK_SOFT_TIME_LIMIT", "3300")),
+    task_time_limit=int(os.getenv("CELERY_TASK_TIME_LIMIT", "3600")),
     task_track_started=True,  # Track quando task inicia
     task_ignore_result=False,  # NÃO ignorar resultados
     # Timezone
